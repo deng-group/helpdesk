@@ -27,7 +27,7 @@
 ### What Happens After You Submit?
 
 ```mermaid
-graph LR
+graph TD
     A[📝 Submit Ticket] --> B[🔔 Tim Notified]
     B --> C[👀 Acknowledged]
     C --> D[🔧 In Progress]
