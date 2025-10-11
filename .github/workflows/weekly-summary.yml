@@ -113,7 +113,7 @@ jobs:
             // Generate report
             let report = `# 📊 Weekly Help Desk Report
 
-**Period:** ${weekStart} to ${weekEnd}
+ **Period:** ${weekStart} to ${weekEnd}
 
 ---
 
@@ -122,11 +122,11 @@ jobs:
 | Metric | Count |
 |--------|-------|
 | 🆕 New Tickets | ${createdThisWeek.length} |
-| ✅ Closed Tickets | closedThisWeek.length} |
+| ✅ Closed Tickets | ${closedThisWeek.length} |
 | 📂 Currently Open | ${currentlyOpen.length} |
 | ⚠️ Overdue | ${overdueTickets.length} |
 
-**Net Change:** ${createdThisWeek.length - closedThisWeek.length > 0 ? '+' : ''}${createdThisWeek.length - closedThisWeek.length}
+ **Net Change:** ${createdThisWeek.length - closedThisWeek.length > 0 ? '+' : ''}${createdThisWeek.length - closedThisWeek.length}
 
 ---
 
