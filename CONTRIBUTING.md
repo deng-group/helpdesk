@@ -257,7 +257,7 @@ If you're having trouble using this help desk system itself:
 ## 📜 Code of Conduct
 
 ### Be Respectful
-- Treat Tim-Pook with respect and patience
+- Treat Tim with respect and patience
 - Be understanding of response times
 - Assume good intentions
 - No harassment or abuse
