@@ -1,0 +1,128 @@
+name: Welcome Bot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    name: Welcome new ticket submitter
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add welcome comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+
+            // Check if officer is on leave
+            let onLeave = false;
+            let leaveInfo = {};
+            try {
+              leaveInfo = yaml.load(fs.readFileSync('.github/on-leave.yml', 'utf8'));
+              onLeave = leaveInfo.on_leave === true;
+            } catch (error) {
+              console.log('Leave config not found, assuming officer is available');
+            }
+
+            // Determine priority and expected timeframes
+            let priority = 'medium';
+            let responseTime = '24 hours';
+            let resolutionTime = '5 days';
+
+            if (labels.includes('priority: urgent')) {
+              priority = 'urgent';
+              responseTime = '2 hours';
+              resolutionTime = '8 hours';
+            } else if (labels.includes('priority: high')) {
+              priority = 'high';
+              responseTime = '4 hours';
+              resolutionTime = '3 days';
+            } else if (labels.includes('priority: low')) {
+              priority = 'low';
+              responseTime = '48 hours';
+              resolutionTime = '7 days';
+            }
+
+            // Create welcome message (different if on leave)
+            let welcomeMessage;
+
+            if (onLeave) {
+              const returnDate = leaveInfo.leave_end || 'TBD';
+              const urgentInstructions = leaveInfo.urgent_instructions || 'Please contact Prof. Zeyu Deng or wait until Tim returns.';
+
+              welcomeMessage = `👋 Hi @${issue.user.login}!
+
+Thank you for submitting this ticket.
+
+📅 **Important Notice:** Tim Pook is currently on leave and will return on **${returnDate}**.
+
+${leaveInfo.leave_reason ? `**Reason:** ${leaveInfo.leave_reason}\n\n` : ''}**What this means for your ticket:**
+- ${priority === 'urgent' ? '🔴 **Urgent ticket:**' : '📋 **Your ticket:**'} Will be addressed when Tim returns
+- **For urgent issues:** ${urgentInstructions}
+- **For non-urgent issues:** Please wait, and Tim will respond when he's back
+
+---
+
+**In the meantime:**
+- 📖 Check our [FAQ](../blob/main/docs/faq.md) for common solutions
+- 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)
+- 💬 Ask in [Discussions](../../discussions) - the community might be able to help
+- 🔔 You'll receive email notifications when Tim responds
+
+If you need to add more information, just comment below!
+
+Thank you for your patience! 🙏
+
+---
+
+*This is an automated message.*`;
+
+            } else {
+              // Normal welcome message (officer available)
+              welcomeMessage = `👋 Hi @${issue.user.login}!
+
+Thank you for submitting this ticket. I've received it and will get back to you soon.
+
+📋 **Ticket Details:**
+- **Priority:** ${priority}
+- **Expected first response:** Within ${responseTime}
+- **Expected resolution:** Within ${resolutionTime}
+
+*These are target timeframes during business hours (Mon-Fri, 9 AM - 5 PM SGT). Complex issues may take longer.*
+
+---
+
+**In the meantime:**
+- 📖 Check our [FAQ](../blob/main/docs/faq.md) for common solutions
+- 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)
+- 🔔 You'll receive email notifications when there are updates
+
+If you need to add more information, just comment below!
+
+**For urgent issues:** If this becomes urgent and you don't get a response within ${responseTime}, email Tim directly at tim.pook@nus.edu.sg with "URGENT" in the subject line.
+
+---
+
+*This is an automated message. Tim will respond personally soon!*`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: welcomeMessage
+            });
+
+            console.log(`Welcome comment added to issue #${issue.number} (on leave: ${onLeave})`);

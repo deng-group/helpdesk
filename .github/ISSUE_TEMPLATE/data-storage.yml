@@ -1,0 +1,180 @@
+name: 💾 Data/Storage Issue
+description: Request help with data management, storage, or backup
+title: "[Data] "
+labels: ["status: new", "category: data"]
+assignees:
+  - timpook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Data/Storage Request
+        Need help with data storage, backup, or management? Please provide details about your request.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this request?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (data loss or critical issue)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request Type
+      description: What kind of help do you need?
+      options:
+        - Need More Storage Space
+        - Data Backup Request
+        - Data Recovery (lost or deleted files)
+        - Data Transfer/Migration
+        - Storage Access Issue
+        - Storage Performance (slow access)
+        - Data Organization Help
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: storage-location
+    attributes:
+      label: Storage Location/System
+      description: Which storage system is this about?
+      placeholder: "Lab shared drive, personal workstation, server-1 /data folder"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Description
+      description: Describe your data/storage issue or request
+      placeholder: "Running out of space on lab shared drive. Currently using 450GB of 500GB quota."
+    validations:
+      required: true
+
+  - type: input
+    id: data-size
+    attributes:
+      label: Data Size (if applicable)
+      description: How much data are you working with?
+      placeholder: "500GB, 2TB, 100MB"
+    validations:
+      required: false
+
+  - type: input
+    id: additional-space
+    attributes:
+      label: Additional Space Needed (if requesting more storage)
+      description: How much additional storage do you need?
+      placeholder: "500GB more (total 1TB), 2TB more"
+    validations:
+      required: false
+
+  - type: textarea
+    id: data-description
+    attributes:
+      label: Data Description
+      description: What type of data is this?
+      placeholder: "Research data: microscopy images, simulation results, analysis scripts"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: data-sensitivity
+    attributes:
+      label: Data Sensitivity
+      description: Does this data contain sensitive information?
+      options:
+        - Public (can be shared openly)
+        - Internal (DENG Group only)
+        - Confidential (restricted access)
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: retention-period
+    attributes:
+      label: Retention Period (if known)
+      description: How long do you need to keep this data?
+      placeholder: "Duration of PhD (3 years), indefinitely, 6 months"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: backup-status
+    attributes:
+      label: Is this data backed up?
+      description: Do you have a backup of this data elsewhere?
+      options:
+        - "Yes, backed up"
+        - "No, not backed up"
+        - "Not sure"
+        - "N/A (this is a backup request)"
+    validations:
+      required: false
+
+  - type: textarea
+    id: data-location
+    attributes:
+      label: Current Data Location (if relevant)
+      description: Where is the data currently located?
+      placeholder: "/home/username/research/data, C:\\Users\\name\\Documents"
+    validations:
+      required: false
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (if any)
+      description: When do you need this resolved?
+      placeholder: "ASAP - out of space, by next week for new experiments"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot work at all (completely blocked)
+        - Significantly slowed down (have workaround but inefficient)
+        - Planning ahead (no immediate impact)
+    validations:
+      required: true
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details
+      placeholder: "This is for the ongoing XYZ project funded by grant ABC."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have cleaned up unnecessary files if requesting more space
+        - label: I have checked current usage and available space
+        - label: I have confirmed this data needs to be stored long-term

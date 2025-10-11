@@ -1,0 +1,152 @@
+name: ❓ General Help
+description: Questions or issues not covered by other categories
+title: "[Help] "
+labels: ["status: new", "category: other"]
+assignees:
+  - timpook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## General Help Request
+        Have a question or need help with something not covered by other categories? We're here to help!
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical issue)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request Type
+      description: What kind of help do you need?
+      options:
+        - Question (how to do something)
+        - Consultation (need advice)
+        - Training (need to learn a tool/system)
+        - Documentation (need written guides)
+        - General Tech Support
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: subject
+    attributes:
+      label: Subject/Topic
+      description: What is this about?
+      placeholder: "Setting up remote desktop, using group resources, best practices for data management"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe your question or request in detail
+      placeholder: "I'm new to the group and need help understanding how to access the lab servers from home."
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-tried
+    attributes:
+      label: What have you tried?
+      description: Have you looked for answers anywhere? What have you tried so far?
+      placeholder: |
+        - Checked the FAQ (didn't find answer)
+        - Asked a colleague
+        - Googled it
+    validations:
+      required: false
+
+  - type: dropdown
+    id: experience-level
+    attributes:
+      label: Your Experience Level
+      description: How familiar are you with this topic?
+      options:
+        - Beginner (new to this)
+        - Intermediate (some experience)
+        - Advanced (experienced but stuck on specific issue)
+    validations:
+      required: false
+
+  - type: input
+    id: related-project
+    attributes:
+      label: Related Project (if applicable)
+      description: Is this related to a specific research project?
+      placeholder: "Project ABC, My PhD research"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: preferred-help-format
+    attributes:
+      label: Preferred Help Format
+      description: How would you prefer to receive help?
+      options:
+        - Written instructions (documentation)
+        - Quick meeting/call (live walkthrough)
+        - Either works for me
+    validations:
+      required: false
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (if any)
+      description: When do you need help by?
+      placeholder: "No rush, by next week, ASAP"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot proceed without help (blocked)
+        - Would be helpful but can work around it
+        - Just planning ahead (no immediate impact)
+    validations:
+      required: true
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details or context
+      placeholder: "I'm a new PhD student who just joined the group last week."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked the FAQ
+        - label: I have searched existing issues
+        - label: I couldn't find this in other categories

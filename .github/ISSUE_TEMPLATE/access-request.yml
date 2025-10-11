@@ -1,0 +1,138 @@
+name: 🔑 Access Request
+description: Request permissions, credentials, or account access
+title: "[Access] "
+labels: ["status: new", "category: access"]
+assignees:
+  - timpook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Access Request
+        Request access to systems, servers, data, or services. Please provide details about what you need access to and why.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this request?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical research operations affected)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: access-type
+    attributes:
+      label: Access Type
+      description: What kind of access do you need?
+      options:
+        - Server/System Access (SSH, RDP, etc.)
+        - VPN Access
+        - Shared Folder/Drive
+        - Database Access
+        - Software License
+        - User Account (new or reset)
+        - Group Membership
+        - Computing Cluster/HPC
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: resource-name
+    attributes:
+      label: Resource/System Name
+      description: What specific system or resource do you need access to?
+      placeholder: "lab-server-1, shared-data folder, MATLAB license"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: permission-level
+    attributes:
+      label: Permission Level Needed
+      description: What level of access do you require?
+      options:
+        - Read Only (view/download only)
+        - Read/Write (can modify files)
+        - Admin (full control)
+        - Not sure (Tim will advise)
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Reason for Request
+      description: Why do you need this access? What will you use it for?
+      placeholder: "Need access to run computational experiments for my research project on machine learning."
+    validations:
+      required: true
+
+  - type: input
+    id: duration
+    attributes:
+      label: Duration of Access
+      description: How long do you need this access?
+      placeholder: "Permanent (ongoing research), 6 months (specific project), temporary (one-time task)"
+    validations:
+      required: false
+
+  - type: input
+    id: supervisor-approval
+    attributes:
+      label: Supervisor/PI Name
+      description: Has your supervisor approved this request? (if applicable)
+      placeholder: "Prof. Zeyu Deng"
+    validations:
+      required: false
+
+  - type: textarea
+    id: existing-accounts
+    attributes:
+      label: Existing Accounts/Credentials
+      description: Do you already have any related accounts or credentials?
+      placeholder: "I already have VPN access, need to add server access using same credentials."
+    validations:
+      required: false
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (if any)
+      description: When do you need this access by?
+      placeholder: "Needed by next Monday for project deadline"
+    validations:
+      required: false
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details
+      placeholder: "I'm a new PhD student who just joined the group."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have confirmed I don't already have this access
+        - label: I have supervisor approval (if required)
+        - label: I understand my responsibilities for secure access

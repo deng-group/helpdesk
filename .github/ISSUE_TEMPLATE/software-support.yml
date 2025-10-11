@@ -1,0 +1,181 @@
+name: 💻 Software Support
+description: Get help with software installation, configuration, or errors
+title: "[Software] "
+labels: ["status: new", "category: software"]
+assignees:
+  - timpook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Software Support Request
+        Need help with software? Please provide details about the software and the issue you're experiencing.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical research operations affected)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request Type
+      description: What kind of help do you need?
+      options:
+        - Installation (need to install new software)
+        - Configuration (software installed but needs setup)
+        - Error/Bug (software not working correctly)
+        - License Issue (activation or license problems)
+        - Update/Upgrade (need newer version)
+        - Training/How-to (need help learning to use software)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: software-name
+    attributes:
+      label: Software Name and Version
+      description: What software are you having trouble with?
+      placeholder: "Python 3.9, MATLAB R2023a, Microsoft Office 365"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating System
+      description: What OS are you using?
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon M1/M2)
+        - macOS (Intel)
+        - Linux (Ubuntu)
+        - Linux (Other)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: computer-name
+    attributes:
+      label: Computer/System
+      description: Which computer or system? (e.g., your laptop, lab workstation, server)
+      placeholder: "My personal laptop, workstation-5, lab-server-1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: Describe the issue or what you're trying to accomplish
+      placeholder: "I'm trying to install pandas library but getting an error message."
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error Message
+      description: Copy and paste any error messages (or attach a screenshot)
+      placeholder: |
+        ModuleNotFoundError: No module named 'pandas'
+
+        Or attach a screenshot below.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: What steps lead to the problem?
+      placeholder: |
+        1. Open terminal
+        2. Activate conda environment: `conda activate myenv`
+        3. Run: `python -c "import pandas"`
+        4. See error
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+      placeholder: "Should import pandas without error and I can use it in my script."
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried to fix the problem?
+      placeholder: |
+        - Tried reinstalling with pip install pandas
+        - Restarted computer
+        - Googled the error message
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot work at all (completely blocked)
+        - Significantly slowed down (have workaround but inefficient)
+        - Minor inconvenience (can work normally with minor adjustments)
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (if any)
+      description: Do you have a specific deadline?
+      placeholder: "Paper submission on Friday, need this by Thursday"
+    validations:
+      required: false
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details or context
+      placeholder: "This was working last week before the system update."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have tried restarting the software/computer
+        - label: I have checked if this is in the FAQ
+        - label: I have searched for similar existing issues
+        - label: I have included the complete error message

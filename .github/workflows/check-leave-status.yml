@@ -1,0 +1,80 @@
+name: Check Leave Status
+
+on:
+  schedule:
+    # Check daily at 8 AM SGT (midnight UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-leave:
+    runs-on: ubuntu-latest
+    name: Check if leave period has ended
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check leave status and auto-update
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            // Read leave config
+            const leaveConfig = yaml.load(fs.readFileSync('.github/on-leave.yml', 'utf8'));
+
+            console.log('Current leave status:', leaveConfig.on_leave);
+
+            if (leaveConfig.on_leave && leaveConfig.leave_end) {
+              const now = new Date();
+              const leaveEnd = new Date(leaveConfig.leave_end);
+
+              console.log(`Leave end date: ${leaveConfig.leave_end}`);
+              console.log(`Current date: ${now.toISOString().split('T')[0]}`);
+
+              // If leave period has ended, remind to update config
+              if (now > leaveEnd) {
+                console.log('Leave period has ended!');
+
+                // Create a reminder issue
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: '🔔 Reminder: Update Leave Status',
+                  body: `Hi @timpook,
+
+Welcome back! 👋
+
+The leave period that was set to end on **${leaveConfig.leave_end}** has now passed.
+
+**Action needed:** Please update \`.github/on-leave.yml\`:
+1. Set \`on_leave: false\`
+2. Clear the leave dates
+
+This will restore normal SLA tracking and remove leave notices from new tickets.
+
+---
+
+To update:
+\`\`\`yaml
+on_leave: false
+leave_start: ""
+leave_end: ""
+leave_reason: ""
+\`\`\`
+
+Or if you've extended your leave, update the \`leave_end\` date.
+
+*This is an automated reminder.*`,
+                  labels: ['needs-attention']
+                });
+
+                console.log('Reminder issue created');
+              }
+            }

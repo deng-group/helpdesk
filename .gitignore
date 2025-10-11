@@ -1,0 +1,36 @@
+# Internal planning documents (not for end users)
+PLAN.md
+PLAN-REVISED.md
+PHASE1-COMPLETE.md
+PHASE2-COMPLETE.md
+LEAVE-MANAGEMENT.md
+MANUAL-OVERRIDES-COMPLETE.md
+
+# Internal documentation (admin/officer only)
+docs/internal/
+
+# Setup/deployment scripts (internal use only)
+setup-labels.sh
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local

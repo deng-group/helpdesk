@@ -1,0 +1,35 @@
+# Computer Officer Leave Configuration
+# Update this file when Tim is on leave
+
+# Set to true when officer is on leave
+on_leave: false
+
+# Leave period (YYYY-MM-DD format)
+leave_start: ""
+leave_end: ""
+
+# Reason (optional - for display to users)
+# Examples: "Annual Leave", "Medical Leave", "Conference"
+leave_reason: ""
+
+# Backup contact information (if available)
+backup_contact_name: ""
+backup_contact_email: ""
+
+# Instructions for urgent issues during leave
+urgent_instructions: "For urgent issues, please contact Prof. Zeyu Deng or wait until Tim returns."
+
+# Auto-response message (shown in welcome bot and on tickets)
+auto_response: |
+  Tim Pook is currently on leave and will return on [RETURN_DATE].
+
+  - For urgent issues: [URGENT_INSTRUCTIONS]
+  - For non-urgent issues: Your ticket will be addressed when Tim returns.
+
+  Thank you for your patience!
+
+# Notes:
+# - Update 'on_leave' to true when leave starts
+# - Set leave dates
+# - Remember to set back to false when leave ends!
+# - Workflows will automatically adjust SLA tracking when on_leave is true
