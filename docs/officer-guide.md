@@ -6,40 +6,34 @@ This is your cheat sheet for managing the help desk. It's not meant to be compre
 
 ## Your Daily Routine
 
-**Morning (5-10 mins)**
+**Regular tasks to do throughout the day:**
 
-Start your day by checking what came in overnight:
-- Go to the [Issues tab](../../issues) and filter by `status: new`
-- Read through new tickets and leave a quick acknowledgment comment
-- Change the label from `new` to `acknowledged`
-- If something looks complicated or needs external help (like waiting on NUS IT), add the `complex-issue` or `waiting-external` label right away
+**Handle new tickets:**
+- Check the [Issues tab](../../issues) for `status: new` tickets
+- Read through and acknowledge them quickly
+- Change label from `new` to `acknowledged`
+- Add `complex-issue` or `waiting-external` if needed
 
-Check if anything's gone stale:
-- Filter by `overdue` label—automation flags these for you
-- Look at `status: waiting-for-user` tickets—if they haven't responded in over a week, ping them or close it
+**Stay on top of existing tickets:**
+- Check for `overdue` labels—automation flags these
+- Review `status: waiting-for-user` tickets—ping or close if no response in a week
+- Update any `in-progress` tickets if there's new info to share
 
-**During the day**
-
-**Stay responsive.** You'll get email notifications when people comment on tickets. Check your email regularly throughout the day—people shouldn't be wondering if you're there.
-
-**Expected availability:**
+**Stay responsive:**
 - Check tickets/email at least **every 2-3 hours** during business hours
-- If you're going to be away from your desk for a while (meeting, lunch, etc.), that's fine—but check when you get back
+- You'll get email notifications when people comment
 - Don't disappear for half a day without checking in
+- If you're away from desk (meeting, lunch), check when you get back
 
-**Handling urgent requests that come in:**
+**Handle urgent requests:**
 
 When you get an urgent ticket (marked `priority: urgent` or something critical):
-1. **Respond the same day, ideally within a few hours**: Even if it's just "I see this, looking into it"
+1. **Respond same day, ideally within a few hours**: Even if it's just "I see this, looking into it"
 2. **Verify it's actually urgent** (see "Priority" section below—don't let people abuse this)
-3. **Prioritize accordingly**: If it's truly urgent (system down, data at risk, deadline imminent), drop what you're doing
+3. **Prioritize accordingly**: If truly urgent (system down, data at risk, deadline imminent), drop what you're doing
 4. **Keep them updated**: If it takes longer than expected, let them know you're still working on it
 
-The formal SLA targets are guidelines for normal tickets. But urgent truly means urgent—people are blocked and waiting on you. For regular tickets, respond within the same business day when possible.
-
-**Before you leave**
-
-Quick 2-minute check: any urgent tickets you missed? Any in-progress tickets that need a status update?
+The formal SLA targets are guidelines for normal tickets. Urgent truly means urgent—people are blocked and waiting on you. For regular tickets, respond within the same business day when possible.
 
 ---
 
