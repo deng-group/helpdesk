@@ -78,7 +78,6 @@ ${leaveInfo.leave_reason ? `**Reason:** ${leaveInfo.leave_reason}\n\n` : ''}**Wh
 **In the meantime:**
 - 📖 Check our [FAQ](../blob/main/docs/faq.md) for common solutions
 - 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)
-- 💬 Ask in [Discussions](../../discussions) - the community might be able to help
 - 🔔 You'll receive email notifications when Tim responds
 
 If you need to add more information, just comment below!

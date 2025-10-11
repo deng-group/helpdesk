@@ -164,16 +164,16 @@ Don't just ignore it - Tim needs to know if the fix worked!
 
 ### Help Others
 
-- Answer questions in [Discussions](../../discussions) if you know the answer
-- Share your solutions - if you figured something out, document it!
+- Share your solutions with Tim - if you figured something out, document it!
 - Be kind and supportive - we're all learning
+- Help colleagues find information in the FAQ before they create tickets
 
 ### Improve the System
 
 Help make this help desk better:
 
-- **Found a mistake in the FAQ?** Submit a correction
-- **Have a suggestion?** Open a discussion or create a ticket
+- **Found a mistake in the FAQ?** Email Tim with a correction
+- **Have a suggestion?** Create a ticket or email Tim
 - **Solved something tricky?** Suggest adding it to the FAQ
 - **Template confusing?** Let us know so we can improve it
 
@@ -239,7 +239,7 @@ Choose the right priority to help everyone:
 Help us improve by:
 
 - Rating your experience (👍 reaction on resolved tickets)
-- Providing feedback in [Discussions](../../discussions)
+- Emailing feedback to Tim or Prof. Deng
 - Suggesting improvements to this system
 - Letting us know what works well and what doesn't
 
@@ -250,18 +250,17 @@ Help us improve by:
 If you're having trouble using this help desk system itself:
 
 1. Check the [README](README.md) for basic instructions
-2. Ask in [Discussions](../../discussions)
-3. Email Tim directly: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
+2. Email Tim directly: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
 
 ---
 
 ## 📜 Code of Conduct
 
 ### Be Respectful
-- Treat Tim and other community members with respect
-- Be patient and understanding
+- Treat Tim with respect and patience
+- Be understanding of response times
 - Assume good intentions
-- No harassment, discrimination, or abuse
+- No harassment or abuse
 
 ### Be Constructive
 - Provide useful information in tickets
@@ -272,7 +271,7 @@ If you're having trouble using this help desk system itself:
 ### Be Responsible
 - Don't abuse the urgent priority
 - Respond promptly when Tim asks questions
-- Close tickets when they're resolved
+- Update tickets with new information
 - Keep sensitive information private
 
 ---
@@ -280,7 +279,6 @@ If you're having trouble using this help desk system itself:
 ## Questions?
 
 - 📖 [Read the FAQ](docs/faq.md)
-- 💬 [Ask in Discussions](../../discussions)
 - 🎫 [Create a ticket](../../issues/new/choose)
 - 📧 [Email Tim](mailto:tim.pook@nus.edu.sg)
 

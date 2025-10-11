@@ -2,7 +2,7 @@
 
 > Your central hub for technical support and assistance
 
-[![GitHub issues](https://img.shields.io/github/issues/zeyudeng/helpdesk)](../../issues)
+[![GitHub issues](https://img.shields.io/github/issues/deng-group/helpdesk)](../../issues)
 [![Response Time](https://img.shields.io/badge/response%20time-24h%20avg-blue)]()
 
 ---
@@ -179,14 +179,11 @@ After you submit a ticket, you can expect:
 ## 📚 Additional Resources
 
 **Documentation:**
-- 📖 [User Guide](docs/user-guide.md) - Detailed instructions for using this system
 - ❓ [FAQ](docs/faq.md) - Frequently asked questions and solutions
-- 🆘 [Escalation Procedures](docs/escalation.md) - When and how to escalate issues
+- 📖 [DENG Group Intranet](https://intranet.matsci.dev/Orientation/get-started) - On-boarding and computing guides
 
 **Self-Service:**
 - 🔍 [Search existing tickets](../../issues) - Someone may have had your issue before
-- 📚 [Knowledge Base](../../wiki) - Common solutions and how-to guides
-- 💬 [Discussions](../../discussions) - Ask questions and share tips with the group
 
 **Quick Troubleshooting:**
 <details>
@@ -210,10 +207,9 @@ After you submit a ticket, you can expect:
 
 **Preferred Contact Methods:**
 1. 🎫 **Create a ticket** (recommended - tracks progress and creates documentation)
-2. 📧 **Email Tim** (for questions about the system or non-technical issues)
-3. 💬 **GitHub Discussions** (for general questions to the community)
+2. 📧 **Email Tim** (for urgent issues or if you don't have a GitHub account)
 
-> **No GitHub account?** No problem! Email Tim directly and he'll create a ticket on your behalf.
+> **No GitHub account?** No problem! Email Tim directly at [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg) and he'll create a ticket on your behalf.
 
 ---
 
@@ -221,9 +217,9 @@ After you submit a ticket, you can expect:
 
 We're always looking to make this help desk better!
 
-- 💭 **Have feedback?** Open a [Discussion](../../discussions/new)
+- 💭 **Have feedback?** Email Prof. Deng or Tim
 - ⭐ **Satisfied with support?** Give the ticket a 👍 reaction
-- 🐛 **Found an issue with this system?** Report it [here](../../issues/new)
+- 🐛 **Found an issue with this system?** Email Tim about it
 
 ---
 
