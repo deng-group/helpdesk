@@ -32,12 +32,6 @@ flowchart TD
     B --> C["🔧 In Progress"]
     C --> D["✅ Resolved"]
     D --> E["🎉 Closed"]
-
-    style A fill:#0366d6,stroke:#044289,stroke-width:2px,color:#fff
-    style B fill:#0366d6,stroke:#044289,stroke-width:2px,color:#fff
-    style C fill:#0366d6,stroke:#044289,stroke-width:2px,color:#fff
-    style D fill:#0366d6,stroke:#044289,stroke-width:2px,color:#fff
-    style E fill:#0366d6,stroke:#044289,stroke-width:2px,color:#fff
 ```
 
 ### Quick Start Guide
