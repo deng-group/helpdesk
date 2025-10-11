@@ -138,12 +138,12 @@ After you submit a ticket, you can expect:
 
 | Priority | First Response | Resolution Target |
 |----------|---------------|-------------------|
-| 🔴 Urgent | 2 hours | 8 hours |
-| 🟠 High | 4 hours | 3 days |
-| 🟡 Medium | 24 hours | 5 days |
-| 🟢 Low | 48 hours | 7 days |
+| 🔴 Urgent | Same day | Same day - 1 day |
+| 🟠 High | Same day | 2-3 days |
+| 🟡 Medium | Within 1 day | 3-5 days |
+| 🟢 Low | Within 2 days | 5-7 days |
 
-> **Note:** These are target timeframes during business hours (Mon-Fri, 9 AM - 5 PM SGT). Complex issues may take longer to resolve. Response times may be slower during holidays and weekends.
+> **Note:** These are guideline timeframes during business hours (Mon-Fri, 9 AM - 5 PM SGT). We aim to acknowledge all tickets promptly so you know we've seen them. Complex issues may take longer to resolve. Response times may be slower during holidays and weekends.
 
 **Business Hours:** Monday - Friday, 9:00 AM - 5:00 PM (Singapore Time)
 **After Hours:** Emergency issues only (see below)

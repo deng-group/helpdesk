@@ -20,7 +20,22 @@ Check if anything's gone stale:
 
 **During the day**
 
-Just respond to stuff as it comes in. You'll get email notifications when people comment on tickets.
+**Stay responsive.** You'll get email notifications when people comment on tickets. Check your email regularly throughout the day—people shouldn't be wondering if you're there.
+
+**Expected availability:**
+- Check tickets/email at least **every 2-3 hours** during business hours
+- If you're going to be away from your desk for a while (meeting, lunch, etc.), that's fine—but check when you get back
+- Don't disappear for half a day without checking in
+
+**Handling urgent requests that come in:**
+
+When you get an urgent ticket (marked `priority: urgent` or something critical):
+1. **Respond the same day, ideally within a few hours**: Even if it's just "I see this, looking into it"
+2. **Verify it's actually urgent** (see "Priority" section below—don't let people abuse this)
+3. **Prioritize accordingly**: If it's truly urgent (system down, data at risk, deadline imminent), drop what you're doing
+4. **Keep them updated**: If it takes longer than expected, let them know you're still working on it
+
+The formal SLA targets are guidelines for normal tickets. But urgent truly means urgent—people are blocked and waiting on you. For regular tickets, respond within the same business day when possible.
 
 **Before you leave**
 
@@ -110,6 +125,15 @@ Copy-paste these and customize:
 Hi @username,
 
 Got your ticket. Looking into it now and will update you soon.
+
+Tim
+```
+
+**Acknowledging an urgent ticket**
+```
+Hi @username,
+
+I see this is urgent. Working on it right now and will have an update for you within [timeframe].
 
 Tim
 ```
@@ -221,6 +245,13 @@ Tim
 ---
 
 ## Tips from Experience
+
+**Being available and responsive**
+- This is a service role—people need to know you're there
+- Check email/tickets regularly throughout the day (at least every 2-3 hours)
+- Quick acknowledgments matter: "Got it, looking into this" takes 10 seconds
+- If you're going to be unavailable (meeting, off-campus, etc.), check messages before and after
+- Don't let tickets sit unacknowledged for hours—even a quick "I see this" helps
 
 **Communication**
 - Respond fast, even if it's just "I've seen this"
