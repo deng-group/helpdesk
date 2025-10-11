@@ -110,89 +110,55 @@ jobs:
               }
             });
 
-            // Generate report
-            let report = `# 📊 Weekly Help Desk Report
+            // Generate report using string concatenation to avoid YAML parsing issues
+            let report = '';
+            report += '# 📊 Weekly Help Desk Report\n\n';
+            report += '**Period:** ' + weekStart + ' to ' + weekEnd + '\n\n';
+            report += '---\n\n## 📈 Overview\n\n';
+            report += '| Metric | Count |\n|--------|-------|\n';
+            report += '| 🆕 New Tickets | ' + createdThisWeek.length + ' |\n';
+            report += '| ✅ Closed Tickets | ' + closedThisWeek.length + ' |\n';
+            report += '| 📂 Currently Open | ' + currentlyOpen.length + ' |\n';
+            report += '| ⚠️ Overdue | ' + overdueTickets.length + ' |\n\n';
+            report += '**Net Change:** ' + (createdThisWeek.length - closedThisWeek.length > 0 ? '+' : '') + (createdThisWeek.length - closedThisWeek.length) + '\n\n';
+            report += '---\n\n## ⏱️ Response Time\n\n';
+            report += '- **Average Response Time:** ' + avgResponseHours + ' hours\n';
+            report += '- **Target:** <24 hours for medium priority\n\n';
+            report += (ticketsWithResponse > 0 ? '*Based on ' + ticketsWithResponse + ' resolved tickets this week*' : '*No tickets resolved this week*') + '\n\n';
+            report += '---\n\n## 📊 Open Tickets Breakdown\n\n### By Priority\n';
+            report += (Object.keys(openByPriority).length > 0 ? Object.entries(openByPriority).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
+            report += '### By Category\n';
+            report += (Object.keys(openByCategory).length > 0 ? Object.entries(openByCategory).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
+            report += '---\n\n## ⚠️ Attention Needed\n\n';
+            if (overdueTickets.length > 0) {
+              report += '### Overdue Tickets (' + overdueTickets.length + ')\n';
+              report += overdueTickets.map(i => '- #' + i.number + ': ' + i.title).join('\n') + '\n\n';
+            } else {
+              report += '✅ No overdue tickets!\n\n';
+            }
+            if (oldestTicketNumber) {
+              report += '### Oldest Open Ticket\n- #' + oldestTicketNumber + ' (' + Math.floor(oldestTicketAge) + ' days old)\n\n';
+            }
+            report += '---\n\n## 📋 Tickets Opened This Week\n\n';
+            if (createdThisWeek.length > 0) {
+              report += createdThisWeek.map(i => {
+                const priority = i.labels.find(l => l.name.startsWith('priority:'))?.name || 'no priority';
+                const category = i.labels.find(l => l.name.startsWith('category:'))?.name || 'uncategorized';
+                return '- #' + i.number + ': ' + i.title + ' [' + priority + ', ' + category + ']';
+              }).join('\n') + '\n\n';
+            } else {
+              report += '*No new tickets this week*\n\n';
+            }
+            report += '---\n\n## ✅ Tickets Closed This Week\n\n';
+            report += (closedThisWeek.length > 0 ? closedThisWeek.map(i => '- #' + i.number + ': ' + i.title).join('\n') : '*No tickets closed this week*') + '\n\n';
+            report += '---\n\n## 💡 Insights\n\n';
+            if (createdThisWeek.length === 0 && closedThisWeek.length === 0) report += '- Quiet week! No new tickets.\n';
+            if (overdueTickets.length > 3) report += '- ⚠️ High number of overdue tickets (' + overdueTickets.length + '). Consider reviewing workload or priorities.\n';
+            if (createdThisWeek.length > closedThisWeek.length + 5) report += '- ⚠️ Tickets are accumulating. New tickets outpacing closures.\n';
+            if (currentlyOpen.length === 0) report += '- 🎉 All tickets resolved! Great work!\n';
+            if (avgResponseHours !== 'N/A' && parseFloat(avgResponseHours) < 12) report += '- ✨ Excellent response time this week!\n';
+            report += '\n---\n\n*This report is generated automatically every Monday. View [all open tickets](../../../issues) or [create a new ticket](../../../issues/new/choose).*';
 
- **Period:** ${weekStart} to ${weekEnd}
-
----
-
-## 📈 Overview
-
-| Metric | Count |
-|--------|-------|
-| 🆕 New Tickets | ${createdThisWeek.length} |
-| ✅ Closed Tickets | ${closedThisWeek.length} |
-| 📂 Currently Open | ${currentlyOpen.length} |
-| ⚠️ Overdue | ${overdueTickets.length} |
-
- **Net Change:** ${createdThisWeek.length - closedThisWeek.length > 0 ? '+' : ''}${createdThisWeek.length - closedThisWeek.length}
-
----
-
-## ⏱️ Response Time
-
-- **Average Response Time:** ${avgResponseHours} hours
-- **Target:** <24 hours for medium priority
-
-${ticketsWithResponse > 0 ? `*Based on ${ticketsWithResponse} resolved tickets this week*` : '*No tickets resolved this week*'}
-
----
-
-## 📊 Open Tickets Breakdown
-
-### By Priority
-${Object.keys(openByPriority).length > 0 ? Object.entries(openByPriority).map(([label, count]) => `- ${label}: ${count}`).join('\n') : '- None'}
-
-### By Category
-${Object.keys(openByCategory).length > 0 ? Object.entries(openByCategory).map(([label, count]) => `- ${label}: ${count}`).join('\n') : '- None'}
-
----
-
-## ⚠️ Attention Needed
-
-${overdueTickets.length > 0 ? `
-### Overdue Tickets (${overdueTickets.length})
-${overdueTickets.map(i => `- #${i.number}: ${i.title}`).join('\n')}
-` : '✅ No overdue tickets!'}
-
-${oldestTicketNumber ? `
-### Oldest Open Ticket
-- #${oldestTicketNumber} (${Math.floor(oldestTicketAge)} days old)
-` : ''}
-
----
-
-## 📋 Tickets Opened This Week
-
-${createdThisWeek.length > 0 ? createdThisWeek.map(i => {
-  const priority = i.labels.find(l => l.name.startsWith('priority:'))?.name || 'no priority';
-  const category = i.labels.find(l => l.name.startsWith('category:'))?.name || 'uncategorized';
-  return `- #${i.number}: ${i.title} [${priority}, ${category}]`;
-}).join('\n') : '*No new tickets this week*'}
-
----
-
-## ✅ Tickets Closed This Week
-
-${closedThisWeek.length > 0 ? closedThisWeek.map(i => `- #${i.number}: ${i.title}`).join('\n') : '*No tickets closed this week*'}
-
----
-
-## 💡 Insights
-
-${createdThisWeek.length === 0 && closedThisWeek.length === 0 ? '- Quiet week! No new tickets.' : ''}
-${overdueTickets.length > 3 ? `- ⚠️ High number of overdue tickets (${overdueTickets.length}). Consider reviewing workload or priorities.` : ''}
-${createdThisWeek.length > closedThisWeek.length + 5 ? '- ⚠️ Tickets are accumulating. New tickets outpacing closures.' : ''}
-${currentlyOpen.length === 0 ? '- 🎉 All tickets resolved! Great work!' : ''}
-${avgResponseHours !== 'N/A' && parseFloat(avgResponseHours) < 12 ? '- ✨ Excellent response time this week!' : ''}
-
----
-
-*This report is generated automatically every Monday. View [all open tickets](../../../issues) or [create a new ticket](../../../issues/new/choose).*
-`;
-
-            // Create issue with report
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

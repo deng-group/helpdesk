@@ -43,35 +43,29 @@ jobs:
                 console.log('Leave period has ended!');
 
                 // Create a reminder issue
+                let reminderBody = 'Hi @timpook,\n\n';
+                reminderBody += 'Welcome back! 👋\n\n';
+                reminderBody += 'The leave period that was set to end on **' + leaveConfig.leave_end + '** has now passed.\n\n';
+                reminderBody += '**Action needed:** Please update `.github/on-leave.yml`:\n';
+                reminderBody += '1. Set `on_leave: false`\n';
+                reminderBody += '2. Clear the leave dates\n\n';
+                reminderBody += 'This will restore normal SLA tracking and remove leave notices from new tickets.\n\n';
+                reminderBody += '---\n\n';
+                reminderBody += 'To update:\n';
+                reminderBody += '```yaml\n';
+                reminderBody += 'on_leave: false\n';
+                reminderBody += 'leave_start: ""\n';
+                reminderBody += 'leave_end: ""\n';
+                reminderBody += 'leave_reason: ""\n';
+                reminderBody += '```\n\n';
+                reminderBody += 'Or if you\'ve extended your leave, update the `leave_end` date.\n\n';
+                reminderBody += '*This is an automated reminder.*';
+
                 await github.rest.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   title: '🔔 Reminder: Update Leave Status',
-                  body: `Hi @timpook,
-
-Welcome back! 👋
-
-The leave period that was set to end on **${leaveConfig.leave_end}** has now passed.
-
-**Action needed:** Please update \`.github/on-leave.yml\`:
-1. Set \`on_leave: false\`
-2. Clear the leave dates
-
-This will restore normal SLA tracking and remove leave notices from new tickets.
-
----
-
-To update:
-\`\`\`yaml
-on_leave: false
-leave_start: ""
-leave_end: ""
-leave_reason: ""
-\`\`\`
-
-Or if you've extended your leave, update the \`leave_end\` date.
-
-*This is an automated reminder.*`,
+                  body: reminderBody,
                   labels: ['needs-attention']
                 });
 
