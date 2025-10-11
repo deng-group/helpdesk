@@ -27,19 +27,17 @@
 ### What Happens After You Submit?
 
 ```mermaid
-graph TD
-    A[📝 Submit Ticket] --> B[🔔 Tim Notified]
-    B --> C[👀 Acknowledged]
-    C --> D[🔧 In Progress]
-    D --> E[✅ Resolved]
-    E --> F[🎉 Closed]
+flowchart LR
+    A["📝 Submit"] --> B["👀 Acknowledged"]
+    B --> C["🔧 In Progress"]
+    C --> D["✅ Resolved"]
+    D --> E["🎉 Closed"]
 
-    style A fill:#e1f5ff
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#e8f5e9
-    style E fill:#fff9c4
-    style F fill:#c8e6c9
+    style A fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    style B fill:#50C878,stroke:#2E8B57,stroke-width:2px,color:#fff
+    style C fill:#FF6B6B,stroke:#CC3333,stroke-width:2px,color:#fff
+    style D fill:#FFA500,stroke:#CC7700,stroke-width:2px,color:#fff
+    style E fill:#32CD32,stroke:#228B22,stroke-width:2px,color:#fff
 ```
 
 ### Quick Start Guide
