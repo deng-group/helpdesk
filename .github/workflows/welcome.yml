@@ -22,16 +22,34 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const yaml = require('js-yaml');
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
 
-            // Check if officer is on leave
+            // Check if officer is on leave by reading YAML file as text
             let onLeave = false;
-            let leaveInfo = {};
+            let leaveInfo = {
+              leave_end: 'TBD',
+              leave_reason: '',
+              urgent_instructions: 'Please contact Prof. Zeyu Deng or wait until Tim returns.'
+            };
+
             try {
-              leaveInfo = yaml.load(fs.readFileSync('.github/on-leave.yml', 'utf8'));
-              onLeave = leaveInfo.on_leave === true;
+              const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+              // Simple parsing - look for "on_leave: true"
+              onLeave = yamlContent.includes('on_leave: true');
+
+              // Extract leave_end date
+              const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+              if (leaveEndMatch) leaveInfo.leave_end = leaveEndMatch[1];
+
+              // Extract leave_reason
+              const leaveReasonMatch = yamlContent.match(/leave_reason:\s*["']([^"']+)["']/);
+              if (leaveReasonMatch) leaveInfo.leave_reason = leaveReasonMatch[1];
+
+              // Extract urgent_instructions
+              const urgentMatch = yamlContent.match(/urgent_instructions:\s*["']([^"']+)["']/);
+              if (urgentMatch) leaveInfo.urgent_instructions = urgentMatch[1];
+
             } catch (error) {
               console.log('Leave config not found, assuming officer is available');
             }

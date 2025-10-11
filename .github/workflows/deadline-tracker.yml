@@ -24,15 +24,28 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const yaml = require('js-yaml');
             const now = new Date();
 
-            // Check if officer is on leave
+            // Check if officer is on leave - simple text parsing
             let onLeave = false;
-            let leaveInfo = {};
+            let leaveInfo = {
+              leave_start: '',
+              leave_end: '',
+              on_leave: false
+            };
+
             try {
-              leaveInfo = yaml.load(fs.readFileSync('.github/on-leave.yml', 'utf8'));
-              onLeave = leaveInfo.on_leave === true;
+              const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+              onLeave = yamlContent.includes('on_leave: true');
+              leaveInfo.on_leave = onLeave;
+
+              // Extract dates
+              const leaveStartMatch = yamlContent.match(/leave_start:\s*["']([^"']+)["']/);
+              if (leaveStartMatch) leaveInfo.leave_start = leaveStartMatch[1];
+
+              const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+              if (leaveEndMatch) leaveInfo.leave_end = leaveEndMatch[1];
+
               console.log(`Leave status: ${onLeave ? 'ON LEAVE' : 'Available'}`);
               if (onLeave) {
                 console.log(`Leave period: ${leaveInfo.leave_start} to ${leaveInfo.leave_end}`);

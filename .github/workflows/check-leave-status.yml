@@ -24,22 +24,31 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const yaml = require('js-yaml');
 
-            // Read leave config
-            const leaveConfig = yaml.load(fs.readFileSync('.github/on-leave.yml', 'utf8'));
+            // Read leave config - simple text parsing
+            const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+
+            // Parse leave status
+            const onLeave = yamlContent.includes('on_leave: true');
+            const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+            const leaveEnd = leaveEndMatch ? leaveEndMatch[1] : null;
+
+            const leaveConfig = {
+              on_leave: onLeave,
+              leave_end: leaveEnd
+            };
 
             console.log('Current leave status:', leaveConfig.on_leave);
 
             if (leaveConfig.on_leave && leaveConfig.leave_end) {
               const now = new Date();
-              const leaveEnd = new Date(leaveConfig.leave_end);
+              const leaveEndDate = new Date(leaveConfig.leave_end);
 
               console.log(`Leave end date: ${leaveConfig.leave_end}`);
               console.log(`Current date: ${now.toISOString().split('T')[0]}`);
 
               // If leave period has ended, remind to update config
-              if (now > leaveEnd) {
+              if (now > leaveEndDate) {
                 console.log('Leave period has ended!');
 
                 // Create a reminder issue
