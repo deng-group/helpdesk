@@ -34,7 +34,7 @@ A well-written ticket gets faster, better help! Include:
 - Mark everything as "urgent" (we'll adjust the priority)
 - Include passwords or sensitive credentials
 - Create duplicate tickets (comment on the existing one instead)
-- Demand immediate fixes (Tim is one person, be patient and respectful)
+- Demand immediate fixes (Tim-Pook is one person, be patient and respectful)
 
 ### Example: Bad vs Good Ticket
 
@@ -79,7 +79,7 @@ things temporarily.
 Priority: Medium
 ```
 
-The good ticket gives Tim everything he needs to help you quickly!
+The good ticket gives Tim-Pook everything he needs to help you quickly!
 
 ---
 
@@ -91,9 +91,9 @@ Your ticket will be labeled to help track its status:
 
 | Label | What It Means | What You Should Do |
 |-------|---------------|-------------------|
-| `status: new` | Just submitted | Wait for Tim to acknowledge it |
-| `status: acknowledged` | Tim has seen it | Expect updates soon |
-| `status: in-progress` | Tim is working on it | Check for any questions from Tim |
+| `status: new` | Just submitted | Wait for Tim-Pook to acknowledge it |
+| `status: acknowledged` | Tim-Pook has seen it | Expect updates soon |
+| `status: in-progress` | Tim-Pook is working on it | Check for any questions from Tim-Pook |
 | `status: waiting-for-user` | **Need info from you** | **Respond ASAP** to avoid delays |
 | `status: resolved` | Fixed, needs your confirmation | **Test it** and confirm it works |
 | `status: closed` | All done! | Optionally rate your experience |
@@ -105,7 +105,7 @@ Your ticket will be labeled to help track its status:
 - 🟡 `medium` - Impacting work but you have a workaround
 - 🟢 `low` - Nice to have, not blocking
 
-**Note:** Tim may adjust the priority if needed. This isn't personal - it's to ensure truly urgent issues get attention first.
+**Note:** Tim-Pook may adjust the priority if needed. This isn't personal - it's to ensure truly urgent issues get attention first.
 
 ### Category Labels
 
@@ -118,7 +118,7 @@ These help organize tickets by type:
 
 ### Responding to Questions
 
-When Tim asks for more information:
+When Tim-Pook asks for more information:
 1. Respond as soon as you can
 2. Answer all the questions
 3. Provide complete information (not partial answers)
@@ -133,13 +133,13 @@ If your situation changes:
 
 ### Testing Resolutions
 
-When Tim marks your ticket as resolved:
+When Tim-Pook marks your ticket as resolved:
 1. Test the fix thoroughly
 2. Reply with either:
    - ✅ "Confirmed working, thank you!"
    - ❌ "Still having issues: [describe what's not working]"
 
-Don't just ignore it - Tim needs to know if the fix worked!
+Don't just ignore it - Tim-Pook needs to know if the fix worked!
 
 ---
 
@@ -164,7 +164,7 @@ Don't just ignore it - Tim needs to know if the fix worked!
 
 ### Help Others
 
-- Share your solutions with Tim - if you figured something out, document it!
+- Share your solutions with Tim-Pook - if you figured something out, document it!
 - Be kind and supportive - we're all learning
 - Help colleagues find information in the FAQ before they create tickets
 
@@ -172,15 +172,15 @@ Don't just ignore it - Tim needs to know if the fix worked!
 
 Help make this help desk better:
 
-- **Found a mistake in the FAQ?** Email Tim with a correction
-- **Have a suggestion?** Create a ticket or email Tim
+- **Found a mistake in the FAQ?** Email Tim-Pook with a correction
+- **Have a suggestion?** Create a ticket or email Tim-Pook
 - **Solved something tricky?** Suggest adding it to the FAQ
 - **Template confusing?** Let us know so we can improve it
 
-### Respect Tim's Time
+### Respect Tim-Pook's Time
 
 Remember:
-- Tim is one person supporting the entire research group
+- Tim-Pook is one person supporting the entire research group
 - Be patient - he's juggling multiple tickets
 - Be respectful - kindness goes a long way
 - Say thank you - it's appreciated!
@@ -198,7 +198,7 @@ Remember:
 - ❌ Confidential research data (unless in private repo)
 - ❌ Credit card numbers or financial info
 
-If you need to share sensitive information, Tim will provide a secure method.
+If you need to share sensitive information, Tim-Pook will provide a secure method.
 
 ---
 
@@ -230,7 +230,7 @@ Choose the right priority to help everyone:
 - Issue doesn't block any work
 - Can wait a week or more
 
-**When in doubt, choose medium.** Tim will adjust if needed.
+**When in doubt, choose medium.** Tim-Pook will adjust if needed.
 
 ---
 
@@ -239,7 +239,7 @@ Choose the right priority to help everyone:
 Help us improve by:
 
 - Rating your experience (👍 reaction on resolved tickets)
-- Emailing feedback to Tim or Prof. Deng
+- Emailing feedback to Tim-Pook or Prof. Deng
 - Suggesting improvements to this system
 - Letting us know what works well and what doesn't
 
@@ -250,14 +250,14 @@ Help us improve by:
 If you're having trouble using this help desk system itself:
 
 1. Check the [README](README.md) for basic instructions
-2. Email Tim directly: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
+2. Email Tim-Pook directly: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
 
 ---
 
 ## 📜 Code of Conduct
 
 ### Be Respectful
-- Treat Tim with respect and patience
+- Treat Tim-Pook with respect and patience
 - Be understanding of response times
 - Assume good intentions
 - No harassment or abuse
@@ -270,7 +270,7 @@ If you're having trouble using this help desk system itself:
 
 ### Be Responsible
 - Don't abuse the urgent priority
-- Respond promptly when Tim asks questions
+- Respond promptly when Tim-Pook asks questions
 - Update tickets with new information
 - Keep sensitive information private
 
@@ -280,7 +280,7 @@ If you're having trouble using this help desk system itself:
 
 - 📖 [Read the FAQ](docs/faq.md)
 - 🎫 [Create a ticket](../../issues/new/choose)
-- 📧 [Email Tim](mailto:tim.pook@nus.edu.sg)
+- 📧 [Email Tim-Pook](mailto:tim.pook@nus.edu.sg)
 
 ---
 

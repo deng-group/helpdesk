@@ -22,7 +22,7 @@
 
 **To get support:** [**Create a new issue**](../../issues/new/choose) and select the appropriate ticket type.
 
-> 💡 **Don't have a GitHub account?** Contact Tim Pook directly at [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
+> 💡 **Don't have a GitHub account?** Contact Tim-Pook directly at [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
 
 ### What Happens After You Submit?
 
@@ -201,7 +201,7 @@ After you submit a ticket, you can expect:
 
 ## 📞 Contact
 
-**Computer Officer:** Tim Pook
+**Computer Officer:** Tim-Pook
 📧 Email: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
 ⏰ Office Hours: Monday - Friday, 9:00 AM - 5:00 PM (SGT)
 
