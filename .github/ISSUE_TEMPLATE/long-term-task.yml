@@ -19,7 +19,6 @@ body:
       description: What type of long-term task is this?
       options:
         - System Setup/Building (new infrastructure or system deployment)
-        - Equipment/Software Purchase (procurement and acquisition)
         - Documentation (guides, procedures, knowledge base)
         - Inventory Management (software/hardware catalog and tracking)
         - License Management (renewal, compliance, tracking)
@@ -37,7 +36,7 @@ body:
     attributes:
       label: Task Title
       description: Brief descriptive title for this task
-      placeholder: "Setup new lab backup system, Purchase licenses for MATLAB R2024"
+      placeholder: "Setup new lab backup system, Create comprehensive documentation for lab systems"
     validations:
       required: true
 

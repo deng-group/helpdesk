@@ -62,13 +62,24 @@ Change label to `acknowledged`.
 - When it's fixed: change to `resolved` and ask them to confirm it works
 - After they confirm (or after 48 hours of silence): close the issue
 
+**Procurement requests**
+
+For purchasing tickets (equipment, software, services):
+- These typically take 4-8 weeks (approval → order → delivery → setup)
+- Verify PI/supervisor approval before proceeding
+- Check budget source and availability
+- Get quotes from vendors if needed
+- Coordinate with department purchasing office
+- Track: approval status → order placed → delivery → setup complete
+- Update stakeholders on timeline and any delays
+- Usually `priority: low` unless there's a specific urgent deadline
+
 **Long-term tasks**
 
-These are different—they're multi-week projects like setting up new systems or buying equipment. For these:
+These are different—they're multi-week projects like setting up new systems or documentation. For these:
 - Review the scope first. Is this realistic? Do you have what you need?
 - Break it into phases/milestones if it's complicated
 - Post weekly updates even if it's just "still working on phase 2"
-- Keep track of budgets and approvals
 - These usually get the `priority: low` label but they're still important work
 
 ---
@@ -94,9 +105,11 @@ You only use one label from each category:
 Don't let people abuse "urgent"—if it's not truly urgent, just adjust it and explain why.
 
 **Category** (what type of problem)
-- `hardware`, `software`, `network`, `access`, `data`, `compute`, `long-term`, `other`
+- `hardware`, `software`, `network`, `access`, `data`, `compute`, `procurement`, `long-term`, `other`
 
 These are usually correct from the template but double-check.
+
+> **Note:** `procurement` is for purchasing requests (equipment, licenses, services). `long-term` is for non-purchasing projects.
 
 **Special labels** (use sparingly)
 
