@@ -94,43 +94,34 @@ jobs:
               const urgentInstructions = leaveInfo.urgent_instructions || 'Please contact Prof. Zeyu Deng or wait until Tim returns.';
 
               welcomeMessage = '👋 Hi @' + issue.user.login + '!\n\n';
-              welcomeMessage += 'Thank you for submitting this ticket.\n\n';
-              welcomeMessage += '📅 **Important Notice:** ' + officerName + ' is currently on leave and will return on **' + returnDate + '**.\n\n';
-              if (leaveInfo.leave_reason) {
-                welcomeMessage += '**Reason:** ' + leaveInfo.leave_reason + '\n\n';
+              welcomeMessage += 'Thanks for your ticket! **' + officerName + ' is currently on leave** and will return on **' + returnDate + '**.\n\n';
+              if (priority === 'urgent') {
+                welcomeMessage += '🔴 **For urgent issues:** ' + urgentInstructions + '\n\n';
+              } else {
+                welcomeMessage += 'Your ticket will be handled when ' + officerName.split(' ')[0] + ' returns. You\'ll get email updates.\n\n';
               }
-              welcomeMessage += '**What this means for your ticket:**\n';
-              welcomeMessage += '- ' + (priority === 'urgent' ? '🔴 **Urgent ticket:**' : '📋 **Your ticket:**') + ' Will be addressed when Tim returns\n';
-              welcomeMessage += '- **For urgent issues:** ' + urgentInstructions + '\n';
-              welcomeMessage += '- **For non-urgent issues:** Please wait, and Tim will respond when he\'s back\n\n';
-              welcomeMessage += '---\n\n';
-              welcomeMessage += '**In the meantime:**\n';
-              welcomeMessage += '- 📖 Check our [FAQ](../blob/main/docs/faq.md) for common solutions\n';
-              welcomeMessage += '- 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)\n';
-              welcomeMessage += '- 🔔 You\'ll receive email notifications when Tim responds\n\n';
-              welcomeMessage += 'If you need to add more information, just comment below!\n\n';
-              welcomeMessage += 'Thank you for your patience! 🙏\n\n';
-              welcomeMessage += '---\n\n';
-              welcomeMessage += '*This is an automated message.*';
+              welcomeMessage += '📖 Check the [FAQ](../blob/main/docs/faq.md) while you wait!\n\n';
+              welcomeMessage += '---\n';
+              welcomeMessage += '*🤖 Automated message*';
 
             } else {
               // Normal welcome message (officer available)
+              const priorityEmoji = {
+                'urgent': '🔴',
+                'high': '🟠',
+                'medium': '🟡',
+                'low': '🟢'
+              };
+
               welcomeMessage = '👋 Hi @' + issue.user.login + '!\n\n';
-              welcomeMessage += 'Thank you for submitting this ticket. I\'ve received it and will get back to you soon.\n\n';
-              welcomeMessage += '📋 **Ticket Details:**\n';
-              welcomeMessage += '- **Priority:** ' + priority + '\n';
-              welcomeMessage += '- **Expected first response:** Within ' + responseTime + '\n';
-              welcomeMessage += '- **Expected resolution:** Within ' + resolutionTime + '\n\n';
-              welcomeMessage += '*These are target timeframes during business hours (Mon-Fri, 9 AM - 5 PM SGT). Complex issues may take longer.*\n\n';
-              welcomeMessage += '---\n\n';
-              welcomeMessage += '**In the meantime:**\n';
-              welcomeMessage += '- 📖 Check our [FAQ](../blob/main/docs/faq.md) for common solutions\n';
-              welcomeMessage += '- 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)\n';
-              welcomeMessage += '- 🔔 You\'ll receive email notifications when there are updates\n\n';
-              welcomeMessage += 'If you need to add more information, just comment below!\n\n';
-              welcomeMessage += '**For urgent issues:** If this becomes urgent and you don\'t get a response within ' + responseTime + ', email ' + officerName.split(' ')[0] + ' directly at ' + officerEmail + ' with "URGENT" in the subject line.\n\n';
-              welcomeMessage += '---\n\n';
-              welcomeMessage += '*This is an automated message. ' + officerName.split(' ')[0] + ' will respond personally soon!*';
+              welcomeMessage += 'Thanks for your ticket! ' + officerName.split(' ')[0] + ' has been notified.\n\n';
+              welcomeMessage += priorityEmoji[priority] + ' **Priority:** ' + priority + ' • **Expected response:** ' + responseTime + '\n\n';
+              welcomeMessage += '📖 Check the [FAQ](../blob/main/docs/faq.md) for quick solutions.\n\n';
+              if (priority === 'urgent' || priority === 'high') {
+                welcomeMessage += '**Urgent?** Email ' + officerEmail + ' if no response within ' + responseTime + '.\n\n';
+              }
+              welcomeMessage += '---\n';
+              welcomeMessage += '*🤖 Automated message • ' + officerName.split(' ')[0] + ' will respond soon!*';
             }
 
             await github.rest.issues.createComment({

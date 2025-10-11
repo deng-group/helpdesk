@@ -1,0 +1,185 @@
+name: 📋 Long-term Task
+description: Non-urgent ongoing duties and projects for IT support
+title: "[Long-term] "
+labels: ["status: new", "category: long-term", "priority: low"]
+assignees:
+  - Tim-Pook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Long-term Task Assignment
+        This template is for non-urgent, ongoing duties and projects that Tim needs to complete over an extended period.
+
+  - type: dropdown
+    id: task-category
+    attributes:
+      label: Task Category
+      description: What type of long-term task is this?
+      options:
+        - System Setup/Building (new infrastructure or system deployment)
+        - Equipment/Software Purchase (procurement and acquisition)
+        - Documentation (guides, procedures, knowledge base)
+        - Inventory Management (software/hardware catalog and tracking)
+        - License Management (renewal, compliance, tracking)
+        - Security & Compliance (audits, policies, security measures)
+        - Training & Development (creating training materials, workshops)
+        - Maintenance & Optimization (system tuning, cleanup, improvements)
+        - Research & Evaluation (testing new tools, technology assessment)
+        - Process Improvement (workflow optimization, automation)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: task-title
+    attributes:
+      label: Task Title
+      description: Brief descriptive title for this task
+      placeholder: "Setup new lab backup system, Purchase licenses for MATLAB R2024"
+    validations:
+      required: true
+
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: Detailed description of what needs to be accomplished
+      placeholder: |
+        Describe the task, objectives, and expected outcomes.
+        Include any relevant context or background information.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope-requirements
+    attributes:
+      label: Scope & Requirements
+      description: What are the specific requirements and scope of this task?
+      placeholder: |
+        - Requirement 1
+        - Requirement 2
+        - Must comply with university IT policies
+        - Budget: $XXX
+    validations:
+      required: true
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Expected Deliverables
+      description: What should be delivered upon completion?
+      placeholder: |
+        - Fully functional backup system
+        - Documentation for system usage
+        - Training session for lab members
+    validations:
+      required: false
+
+  - type: dropdown
+    id: estimated-duration
+    attributes:
+      label: Estimated Duration
+      description: How long do you expect this task to take?
+      options:
+        - 1-2 weeks
+        - 2-4 weeks
+        - 1-2 months
+        - 2-3 months
+        - 3-6 months
+        - 6+ months
+        - Ongoing (no fixed end date)
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Target Deadline
+      description: When should this be completed by? (flexible, can be adjusted)
+      placeholder: "End of Q2 2025, Before semester starts (August 2025)"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority-level
+    attributes:
+      label: Priority Level
+      description: How important is this task?
+      options:
+        - Low (nice to have, no rush)
+        - Medium (should be done when time permits)
+        - High (important but not urgent)
+    validations:
+      required: true
+
+  - type: textarea
+    id: budget-resources
+    attributes:
+      label: Budget & Resources
+      description: What budget or resources are needed?
+      placeholder: |
+        Budget: $XXX
+        Resources needed:
+        - Access to server room
+        - Admin credentials for systems
+        - Vendor contact information
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Blockers
+      description: Are there any dependencies or potential blockers?
+      placeholder: |
+        - Waiting for approval from department head
+        - Need budget confirmation
+        - Depends on completion of server upgrade
+    validations:
+      required: false
+
+  - type: textarea
+    id: milestones
+    attributes:
+      label: Milestones / Checkpoints
+      description: Break down the task into major milestones or checkpoints
+      placeholder: |
+        - [ ] Phase 1: Research and planning (Week 1-2)
+        - [ ] Phase 2: Procurement and setup (Week 3-4)
+        - [ ] Phase 3: Testing and validation (Week 5-6)
+        - [ ] Phase 4: Documentation and rollout (Week 7-8)
+    validations:
+      required: false
+
+  - type: input
+    id: stakeholders
+    attributes:
+      label: Stakeholders / Point of Contact
+      description: Who should be kept informed or consulted?
+      placeholder: "Prof. Smith, Lab Manager Jane Doe"
+    validations:
+      required: false
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success Criteria
+      description: How will we know this task is completed successfully?
+      placeholder: |
+        - System is operational and tested
+        - Documentation is complete
+        - Users are trained and satisfied
+        - Meets all requirements
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other relevant information
+      placeholder: "Related to previous project X, coordinate with vendor Y"
+    validations:
+      required: false

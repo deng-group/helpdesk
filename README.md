@@ -44,6 +44,7 @@
    | 🌐 **Network Issues** | Connectivity problems | Can't connect to lab network, slow internet |
    | 💾 **Data/Storage** | Data management needs | Need more storage space, data backup, file recovery |
    | ⚡ **Computing Resources** | HPC/cluster issues | Job won't run on cluster, GPU allocation |
+   | 📋 **Long-term Task** | Non-urgent projects/duties | System setup, procurement, documentation projects |
    | ❓ **General Help** | Everything else | Questions, consultations, other requests |
 
 3. **Fill out** the form with as much detail as possible
@@ -109,6 +110,25 @@ Choose the right priority to help us help you:
 | 🟠 **High** | Blocking your work, no workaround | Can't access critical files, software license expired |
 | 🟡 **Medium** | Impacting work but have workaround | Slow performance, minor bugs, feature requests |
 | 🟢 **Low** | Nice to have, not blocking | General questions, optimization, documentation |
+
+### Long-term Tasks
+
+**For administrative and long-term projects only.** Use the **📋 Long-term Task** template for:
+
+- **System Setup/Building**: Infrastructure projects, new lab systems
+- **Equipment/Software Procurement**: Purchase requests and vendor coordination
+- **Documentation Projects**: Creating guides, procedures, knowledge base articles
+- **Maintenance & Optimization**: System improvements, cleanup projects
+- **Research & Evaluation**: Testing new tools, technology assessment
+
+**Key features:**
+- Flexible deadlines (manually adjustable)
+- Milestone tracking with checkpoints
+- Budget and resource planning
+- Extended duration support (weeks to months)
+- Progress tracking over time
+
+> **Note:** Long-term tasks are for projects that take extended periods to complete. For immediate support needs, use the standard ticket templates above.
 
 ---
 
