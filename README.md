@@ -26,9 +26,20 @@
 
 ### What Happens After You Submit?
 
-```
-📝 You submit ticket → 🔔 Tim gets notified → 👀 Ticket acknowledged
-→ 🔧 Work begins → ✅ Resolved → 🎉 Ticket closed
+```mermaid
+graph LR
+    A[📝 Submit Ticket] --> B[🔔 Tim Notified]
+    B --> C[👀 Acknowledged]
+    C --> D[🔧 In Progress]
+    D --> E[✅ Resolved]
+    E --> F[🎉 Closed]
+
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style C fill:#f3e5f5
+    style D fill:#e8f5e9
+    style E fill:#fff9c4
+    style F fill:#c8e6c9
 ```
 
 ### Quick Start Guide
@@ -227,9 +238,9 @@ After you submit a ticket, you can expect:
 
 ## 📞 Contact
 
-**Computer Officer:** Tim-Pook
-📧 Email: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
-⏰ Office Hours: Monday - Friday, 9:00 AM - 5:00 PM (SGT)
+**Computer Officer:** Tim Pook
+- 📧 Email: [tim.pook@nus.edu.sg](mailto:tim.pook@nus.edu.sg)
+- ⏰ Office Hours: Monday - Friday, 9:00 AM - 5:00 PM (SGT)
 
 **Preferred Contact Methods:**
 1. 🎫 **Create a ticket** (recommended - tracks progress and creates documentation)
