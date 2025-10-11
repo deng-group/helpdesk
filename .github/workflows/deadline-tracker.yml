@@ -28,12 +28,17 @@ jobs:
 
             // Read officer config
             let officerUsername = 'Tim-Pook'; // fallback
+            let officerName = 'Tim Pook'; // fallback
             try {
               const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
               const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              const nameMatch = officerConfig.match(/name:\s*["']([^"']+)["']/);
               if (usernameMatch) {
                 officerUsername = usernameMatch[1];
                 console.log(`Officer: @${officerUsername}`);
+              }
+              if (nameMatch) {
+                officerName = nameMatch[1];
               }
             } catch (error) {
               console.log('Officer config not found, using default');
@@ -95,13 +100,22 @@ jobs:
 
                 if (!hasLeaveNotice) {
                   const returnDate = leaveInfo.leave_end || 'TBD';
-                  const urgentInstructions = leaveInfo.urgent_instructions || 'Please wait until Tim returns.';
+                  const urgentInstructions = leaveInfo.urgent_instructions || 'Please wait until ' + officerName.split(' ')[0] + ' returns.';
+
+                  let leaveNotice = '📅 **Leave Notice**\n\n';
+                  leaveNotice += officerName + ' is currently on leave and will return on **' + returnDate + '**.\n\n';
+                  if (leaveInfo.leave_reason) {
+                    leaveNotice += 'Reason: ' + leaveInfo.leave_reason + '\n\n';
+                  }
+                  leaveNotice += '- **For urgent issues:** ' + urgentInstructions + '\n';
+                  leaveNotice += '- **For non-urgent issues:** Your ticket will be addressed when ' + officerName.split(' ')[0] + ' returns.\n\n';
+                  leaveNotice += 'Thank you for your patience! 🙏';
 
                   await github.rest.issues.createComment({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issue.number,
-                    body: `📅 **Leave Notice**\n\nTim Pook is currently on leave and will return on **${returnDate}**.\n\n${leaveInfo.leave_reason ? `Reason: ${leaveInfo.leave_reason}\n\n` : ''}- **For urgent issues:** ${urgentInstructions}\n- **For non-urgent issues:** Your ticket will be addressed when Tim returns.\n\nThank you for your patience! 🙏`
+                    body: leaveNotice
                   });
 
                   console.log(`Added leave notice to issue #${issue.number}`);

@@ -25,6 +25,19 @@ jobs:
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
 
+            // Read officer config
+            let officerName = 'Tim Pook'; // fallback
+            let officerEmail = 'tim.pook@nus.edu.sg'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const nameMatch = officerConfig.match(/name:\s*["']([^"']+)["']/);
+              const emailMatch = officerConfig.match(/email:\s*["']([^"']+)["']/);
+              if (nameMatch) officerName = nameMatch[1];
+              if (emailMatch) officerEmail = emailMatch[1];
+            } catch (error) {
+              console.log('Officer config not found, using defaults');
+            }
+
             // Check if officer is on leave by reading YAML file as text
             let onLeave = false;
             let leaveInfo = {
@@ -82,7 +95,7 @@ jobs:
 
               welcomeMessage = '👋 Hi @' + issue.user.login + '!\n\n';
               welcomeMessage += 'Thank you for submitting this ticket.\n\n';
-              welcomeMessage += '📅 **Important Notice:** Tim Pook is currently on leave and will return on **' + returnDate + '**.\n\n';
+              welcomeMessage += '📅 **Important Notice:** ' + officerName + ' is currently on leave and will return on **' + returnDate + '**.\n\n';
               if (leaveInfo.leave_reason) {
                 welcomeMessage += '**Reason:** ' + leaveInfo.leave_reason + '\n\n';
               }
@@ -115,9 +128,9 @@ jobs:
               welcomeMessage += '- 📚 Review our [intranet guides](https://intranet.matsci.dev/Orientation/get-started)\n';
               welcomeMessage += '- 🔔 You\'ll receive email notifications when there are updates\n\n';
               welcomeMessage += 'If you need to add more information, just comment below!\n\n';
-              welcomeMessage += '**For urgent issues:** If this becomes urgent and you don\'t get a response within ' + responseTime + ', email Tim directly at tim.pook@nus.edu.sg with "URGENT" in the subject line.\n\n';
+              welcomeMessage += '**For urgent issues:** If this becomes urgent and you don\'t get a response within ' + responseTime + ', email ' + officerName.split(' ')[0] + ' directly at ' + officerEmail + ' with "URGENT" in the subject line.\n\n';
               welcomeMessage += '---\n\n';
-              welcomeMessage += '*This is an automated message. Tim will respond personally soon!*';
+              welcomeMessage += '*This is an automated message. ' + officerName.split(' ')[0] + ' will respond personally soon!*';
             }
 
             await github.rest.issues.createComment({
