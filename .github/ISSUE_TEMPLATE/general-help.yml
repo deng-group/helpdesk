@@ -3,7 +3,7 @@ description: Questions or issues not covered by other categories
 title: "[Help] "
 labels: ["status: new", "category: other"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

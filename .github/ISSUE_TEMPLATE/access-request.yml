@@ -3,7 +3,7 @@ description: Request permissions, credentials, or account access
 title: "[Access] "
 labels: ["status: new", "category: access"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

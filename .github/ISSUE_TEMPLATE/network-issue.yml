@@ -3,7 +3,7 @@ description: Report connectivity or network problems
 title: "[Network] "
 labels: ["status: new", "category: network"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

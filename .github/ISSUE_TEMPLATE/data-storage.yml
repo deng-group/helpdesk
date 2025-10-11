@@ -3,7 +3,7 @@ description: Request help with data management, storage, or backup
 title: "[Data] "
 labels: ["status: new", "category: data"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

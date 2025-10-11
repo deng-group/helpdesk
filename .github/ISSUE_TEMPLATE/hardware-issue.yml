@@ -3,7 +3,7 @@ description: Report problems with computers, printers, or other equipment
 title: "[Hardware] "
 labels: ["status: new", "category: hardware"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

@@ -3,7 +3,7 @@ description: Get help with software installation, configuration, or errors
 title: "[Software] "
 labels: ["status: new", "category: software"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown

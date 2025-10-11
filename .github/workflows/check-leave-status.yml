@@ -52,7 +52,7 @@ jobs:
                 console.log('Leave period has ended!');
 
                 // Create a reminder issue
-                let reminderBody = 'Hi @timpook,\n\n';
+                let reminderBody = 'Hi @Tim-Pook,\n\n';
                 reminderBody += 'Welcome back! 👋\n\n';
                 reminderBody += 'The leave period that was set to end on **' + leaveConfig.leave_end + '** has now passed.\n\n';
                 reminderBody += '**Action needed:** Please update `.github/on-leave.yml`:\n';

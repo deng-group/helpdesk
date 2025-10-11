@@ -3,7 +3,7 @@ description: Issues with HPC, servers, or computing cluster resources
 title: "[Compute] "
 labels: ["status: new", "category: compute"]
 assignees:
-  - timpook
+  - Tim-Pook
 
 body:
   - type: markdown
