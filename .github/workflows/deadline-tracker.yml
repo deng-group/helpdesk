@@ -26,6 +26,19 @@ jobs:
             const fs = require('fs');
             const now = new Date();
 
+            // Read officer config
+            let officerUsername = 'Tim-Pook'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              if (usernameMatch) {
+                officerUsername = usernameMatch[1];
+                console.log(`Officer: @${officerUsername}`);
+              }
+            } catch (error) {
+              console.log('Officer config not found, using default');
+            }
+
             // Check if officer is on leave - simple text parsing
             let onLeave = false;
             let leaveInfo = {
@@ -192,7 +205,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: issue.number,
-                      body: `⚠️ **Response Overdue**\n\nThis ticket has not been acknowledged within the expected ${responseDeadline} hour timeframe.\n\n@Tim-Pook - Please review and acknowledge this ticket.\n\n*Business hours: Mon-Fri, 9 AM - 5 PM SGT*`
+                      body: `⚠️ **Response Overdue**\n\nThis ticket has not been acknowledged within the expected ${responseDeadline} hour timeframe.\n\n@${officerUsername} - Please review and acknowledge this ticket.\n\n*Business hours: Mon-Fri, 9 AM - 5 PM SGT*`
                     });
                   }
                 } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {
@@ -231,7 +244,7 @@ jobs:
                       owner: context.repo.owner,
                       repo: context.repo.repo,
                       issue_number: issue.number,
-                      body: `⏰ **Resolution Overdue**\n\nThis ticket has exceeded the expected resolution timeframe by ${daysPast} days.\n\n@Tim-Pook - Please provide an update on progress.\n\n*Expected resolution: ${resolutionDeadline} hours (~${(resolutionDeadline/24).toFixed(1)} days)*`
+                      body: `⏰ **Resolution Overdue**\n\nThis ticket has exceeded the expected resolution timeframe by ${daysPast} days.\n\n@${officerUsername} - Please provide an update on progress.\n\n*Expected resolution: ${resolutionDeadline} hours (~${(resolutionDeadline/24).toFixed(1)} days)*`
                     });
                   }
                 } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {

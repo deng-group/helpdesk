@@ -25,6 +25,18 @@ jobs:
           script: |
             const fs = require('fs');
 
+            // Read officer config
+            let officerUsername = 'Tim-Pook'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              if (usernameMatch) {
+                officerUsername = usernameMatch[1];
+              }
+            } catch (error) {
+              console.log('Officer config not found, using default');
+            }
+
             // Read leave config - simple text parsing
             const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
 
@@ -52,7 +64,7 @@ jobs:
                 console.log('Leave period has ended!');
 
                 // Create a reminder issue
-                let reminderBody = 'Hi @Tim-Pook,\n\n';
+                let reminderBody = 'Hi @' + officerUsername + ',\n\n';
                 reminderBody += 'Welcome back! 👋\n\n';
                 reminderBody += 'The leave period that was set to end on **' + leaveConfig.leave_end + '** has now passed.\n\n';
                 reminderBody += '**Action needed:** Please update `.github/on-leave.yml`:\n';
