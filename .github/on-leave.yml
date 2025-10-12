@@ -5,16 +5,16 @@
 on_leave: false
 
 # Leave period (YYYY-MM-DD format)
-leave_start: ""
-leave_end: ""
+leave_start: "2025-10-03"
+leave_end: "2025-10-23"
 
 # Reason (optional - for display to users)
 # Examples: "Annual Leave", "Medical Leave", "Conference"
-leave_reason: ""
+leave_reason: "Annual leave"
 
 # Backup contact information (if available)
-backup_contact_name: ""
-backup_contact_email: ""
+backup_contact_name: "Jerry"
+backup_contact_email: "msedz@nus.edu.sg"
 
 # Instructions for urgent issues during leave
 urgent_instructions: "For urgent issues, please contact Prof. Zeyu Deng or wait until Tim returns."
