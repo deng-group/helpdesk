@@ -2,7 +2,7 @@
 # Update this file when Tim is on leave
 
 # Set to true when officer is on leave
-on_leave: false
+on_leave: true
 
 # Leave period (YYYY-MM-DD format)
 leave_start: "2025-10-03"
