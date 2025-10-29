@@ -31,15 +31,15 @@ update_file() {
     # Create backup
     cp "$file" "$file.bak"
 
-    # Replace full name
-    sed -i '' "s/Tim Pook/$OFFICER_NAME/g" "$file"
+    # Replace full name (cross-platform sed syntax)
+    sed -i.tmp "s/Tim Pook/$OFFICER_NAME/g" "$file" && rm -f "$file.tmp"
 
     # Replace email
-    sed -i '' "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" "$file"
+    sed -i.tmp "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" "$file" && rm -f "$file.tmp"
 
     # Replace first name only in CONTRIBUTING.md
     if [[ "$file" == "CONTRIBUTING.md" ]]; then
-        sed -i '' "s/\bTim\b/$OFFICER_FIRST_NAME/g" "$file"
+        sed -i.tmp "s/\bTim\b/$OFFICER_FIRST_NAME/g" "$file" && rm -f "$file.tmp"
     fi
 
     # Check if file changed
