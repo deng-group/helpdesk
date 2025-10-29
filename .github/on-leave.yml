@@ -2,15 +2,15 @@
 # Update this file when Tim is on leave
 
 # Set to true when officer is on leave
-on_leave: true
+on_leave: false
 
 # Leave period (YYYY-MM-DD format)
-leave_start: "2025-10-03"
-leave_end: "2025-10-23"
+leave_start: ""
+leave_end: ""
 
 # Reason (optional - for display to users)
 # Examples: "Annual Leave", "Medical Leave", "Conference"
-leave_reason: "Annual leave"
+leave_reason: ""
 
 # Backup contact information (if available)
 backup_contact_name: "Jerry"
