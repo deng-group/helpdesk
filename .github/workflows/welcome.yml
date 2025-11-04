@@ -1,0 +1,165 @@
+name: Welcome Bot
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    name: Welcome new ticket submitter
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add welcome comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const issue = context.payload.issue;
+            let labels = issue.labels.map(l => l.name);
+
+            // Parse issue body to extract and add priority label if not already set
+            const issueBody = issue.body || '';
+            const hasPriorityLabel = labels.some(l => l.startsWith('priority:'));
+
+            if (!hasPriorityLabel) {
+              let priorityLabel = null;
+
+              // Check for priority in issue body
+              if (issueBody.includes('Low (can wait a week)')) {
+                priorityLabel = 'priority: low';
+              } else if (issueBody.includes('Medium (needed within a few days)')) {
+                priorityLabel = 'priority: medium';
+              } else if (issueBody.includes('High (blocking my work)')) {
+                priorityLabel = 'priority: high';
+              } else if (issueBody.includes('Urgent (critical issue)')) {
+                priorityLabel = 'priority: urgent';
+              }
+
+              // Add the priority label if found
+              if (priorityLabel) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [priorityLabel]
+                });
+                labels.push(priorityLabel);
+                console.log(`Added label: ${priorityLabel}`);
+              }
+            }
+
+            // Read officer config
+            let officerName = 'Tim Pook'; // fallback
+            let officerEmail = 'tim.pook@nus.edu.sg'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const nameMatch = officerConfig.match(/name:\s*["']([^"']+)["']/);
+              const emailMatch = officerConfig.match(/email:\s*["']([^"']+)["']/);
+              if (nameMatch) officerName = nameMatch[1];
+              if (emailMatch) officerEmail = emailMatch[1];
+            } catch (error) {
+              console.log('Officer config not found, using defaults');
+            }
+
+            // Check if officer is on leave by reading YAML file as text
+            let onLeave = false;
+            let leaveInfo = {
+              leave_end: 'TBD',
+              leave_reason: '',
+              urgent_instructions: 'Please contact Prof. Zeyu Deng or wait until Tim returns.'
+            };
+
+            try {
+              const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+              // Simple parsing - look for "on_leave: true"
+              onLeave = yamlContent.includes('on_leave: true');
+
+              // Extract leave_end date
+              const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+              if (leaveEndMatch) leaveInfo.leave_end = leaveEndMatch[1];
+
+              // Extract leave_reason
+              const leaveReasonMatch = yamlContent.match(/leave_reason:\s*["']([^"']+)["']/);
+              if (leaveReasonMatch) leaveInfo.leave_reason = leaveReasonMatch[1];
+
+              // Extract urgent_instructions
+              const urgentMatch = yamlContent.match(/urgent_instructions:\s*["']([^"']+)["']/);
+              if (urgentMatch) leaveInfo.urgent_instructions = urgentMatch[1];
+
+            } catch (error) {
+              console.log('Leave config not found, assuming officer is available');
+            }
+
+            // Determine priority and expected timeframes
+            let priority = 'medium';
+            let responseTime = '24 hours';
+            let resolutionTime = '5 days';
+
+            if (labels.includes('priority: urgent')) {
+              priority = 'urgent';
+              responseTime = '2 hours';
+              resolutionTime = '8 hours';
+            } else if (labels.includes('priority: high')) {
+              priority = 'high';
+              responseTime = '4 hours';
+              resolutionTime = '3 days';
+            } else if (labels.includes('priority: low')) {
+              priority = 'low';
+              responseTime = '48 hours';
+              resolutionTime = '7 days';
+            }
+
+            // Create welcome message (different if on leave)
+            let welcomeMessage;
+
+            if (onLeave) {
+              const returnDate = leaveInfo.leave_end || 'TBD';
+              const urgentInstructions = leaveInfo.urgent_instructions || 'Please contact Prof. Zeyu Deng or wait until Tim returns.';
+
+              welcomeMessage = '👋 Hi @' + issue.user.login + '!\n\n';
+              welcomeMessage += 'Thanks for your ticket! **' + officerName + ' is currently on leave** and will return on **' + returnDate + '**.\n\n';
+              if (priority === 'urgent') {
+                welcomeMessage += '🔴 **For urgent issues:** ' + urgentInstructions + '\n\n';
+              } else {
+                welcomeMessage += 'Your ticket will be handled when ' + officerName.split(' ')[0] + ' returns. You\'ll get email updates.\n\n';
+              }
+              welcomeMessage += '📖 Check the [FAQ](../blob/main/docs/faq.md) while you wait!\n\n';
+              welcomeMessage += '---\n';
+              welcomeMessage += '*🤖 Automated message*';
+
+            } else {
+              // Normal welcome message (officer available)
+              const priorityEmoji = {
+                'urgent': '🔴',
+                'high': '🟠',
+                'medium': '🟡',
+                'low': '🟢'
+              };
+
+              welcomeMessage = '👋 Hi @' + issue.user.login + '!\n\n';
+              welcomeMessage += 'Thanks for your ticket! ' + officerName.split(' ')[0] + ' has been notified.\n\n';
+              welcomeMessage += priorityEmoji[priority] + ' **Priority:** ' + priority + ' • **Expected response:** ' + responseTime + '\n\n';
+              welcomeMessage += '📖 Check the [FAQ](../blob/main/docs/faq.md) for quick solutions.\n\n';
+              if (priority === 'urgent' || priority === 'high') {
+                welcomeMessage += '**Urgent?** Email ' + officerEmail + ' if no response within ' + responseTime + '.\n\n';
+              }
+              welcomeMessage += '---\n';
+              welcomeMessage += '*🤖 Automated message • ' + officerName.split(' ')[0] + ' will respond soon!*';
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: welcomeMessage
+            });
+
+            console.log(`Welcome comment added to issue #${issue.number} (on leave: ${onLeave})`);

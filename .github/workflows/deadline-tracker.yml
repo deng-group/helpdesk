@@ -1,0 +1,323 @@
+name: Deadline Tracker
+
+on:
+  schedule:
+    # Run every day at 9 AM SGT (1 AM UTC)
+    - cron: '0 1 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-deadlines:
+    runs-on: ubuntu-latest
+    name: Check ticket deadlines and update labels
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for overdue tickets
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const now = new Date();
+
+            // Read officer config
+            let officerUsername = 'Tim-Pook'; // fallback
+            let officerName = 'Tim Pook'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              const nameMatch = officerConfig.match(/name:\s*["']([^"']+)["']/);
+              if (usernameMatch) {
+                officerUsername = usernameMatch[1];
+                console.log(`Officer: @${officerUsername}`);
+              }
+              if (nameMatch) {
+                officerName = nameMatch[1];
+              }
+            } catch (error) {
+              console.log('Officer config not found, using default');
+            }
+
+            // Check if officer is on leave - simple text parsing
+            let onLeave = false;
+            let leaveInfo = {
+              leave_start: '',
+              leave_end: '',
+              on_leave: false
+            };
+
+            try {
+              const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+              onLeave = yamlContent.includes('on_leave: true');
+              leaveInfo.on_leave = onLeave;
+
+              // Extract dates
+              const leaveStartMatch = yamlContent.match(/leave_start:\s*["']([^"']+)["']/);
+              if (leaveStartMatch) leaveInfo.leave_start = leaveStartMatch[1];
+
+              const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+              if (leaveEndMatch) leaveInfo.leave_end = leaveEndMatch[1];
+
+              console.log(`Leave status: ${onLeave ? 'ON LEAVE' : 'Available'}`);
+              if (onLeave) {
+                console.log(`Leave period: ${leaveInfo.leave_start} to ${leaveInfo.leave_end}`);
+              }
+            } catch (error) {
+              console.log('Leave config not found or error reading it, assuming officer is available');
+            }
+
+            // If on leave, skip SLA tracking but add leave notice to new tickets
+            if (onLeave) {
+              console.log('Officer is on leave - skipping SLA enforcement');
+
+              // Add leave notice to any new tickets without one
+              const newIssues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'status: new',
+                per_page: 100
+              });
+
+              for (const issue of newIssues.data) {
+                if (issue.pull_request) continue;
+
+                // Check if leave notice already added
+                const comments = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  per_page: 100
+                });
+
+                const hasLeaveNotice = comments.data.some(c => c.body.includes('currently on leave'));
+
+                if (!hasLeaveNotice) {
+                  const returnDate = leaveInfo.leave_end || 'TBD';
+                  const urgentInstructions = leaveInfo.urgent_instructions || 'Please wait until ' + officerName.split(' ')[0] + ' returns.';
+
+                  let leaveNotice = '📅 **Leave Notice**\n\n';
+                  leaveNotice += officerName + ' is currently on leave and will return on **' + returnDate + '**.\n\n';
+                  if (leaveInfo.leave_reason) {
+                    leaveNotice += 'Reason: ' + leaveInfo.leave_reason + '\n\n';
+                  }
+                  leaveNotice += '- **For urgent issues:** ' + urgentInstructions + '\n';
+                  leaveNotice += '- **For non-urgent issues:** Your ticket will be addressed when ' + officerName.split(' ')[0] + ' returns.\n\n';
+                  leaveNotice += 'Thank you for your patience! 🙏';
+
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: leaveNotice
+                  });
+
+                  console.log(`Added leave notice to issue #${issue.number}`);
+                }
+              }
+
+              console.log('Leave handling complete. Exiting without SLA checks.');
+              return; // Exit early - don't do SLA tracking during leave
+            }
+
+            // Normal SLA tracking (officer is available)
+            console.log('Officer is available - performing normal SLA checks');
+
+            // Define SLA timeframes (in hours)
+            const SLA = {
+              response: {
+                'priority: urgent': 2,
+                'priority: high': 4,
+                'priority: medium': 24,
+                'priority: low': 48
+              },
+              resolution: {
+                'priority: urgent': 8,
+                'priority: high': 72,   // 3 days
+                'priority: medium': 120, // 5 days
+                'priority: low': 168     // 7 days
+              }
+            };
+
+            // Get all open issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            console.log(`Found ${issues.data.length} open issues`);
+
+            for (const issue of issues.data) {
+              // Skip if it's a pull request
+              if (issue.pull_request) continue;
+
+              const labels = issue.labels.map(l => l.name);
+
+              // Skip long-term projects (they have flexible deadlines)
+              if (labels.includes('category: long-term')) {
+                console.log(`Issue #${issue.number} is a long-term project - skipping SLA checks`);
+
+                // Remove overdue/at-risk labels if present on long-term projects
+                if (labels.includes('overdue')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    name: 'overdue'
+                  }).catch(() => {});
+                }
+                if (labels.includes('at-risk')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    name: 'at-risk'
+                  }).catch(() => {});
+                }
+
+                continue; // Skip to next issue
+              }
+
+              // Skip if manual override/exception labels are present
+              const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay'];
+              const hasOverride = overrideLabels.some(label => labels.includes(label));
+
+              if (hasOverride) {
+                console.log(`Issue #${issue.number} has override label - skipping SLA checks`);
+
+                // Remove overdue/at-risk labels if present (manual override takes precedence)
+                if (labels.includes('overdue')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    name: 'overdue'
+                  }).catch(() => {});
+                }
+                if (labels.includes('at-risk')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    name: 'at-risk'
+                  }).catch(() => {});
+                }
+
+                continue; // Skip to next issue
+              }
+
+              const createdAt = new Date(issue.created_at);
+              const ageHours = (now - createdAt) / (1000 * 60 * 60);
+
+              // Determine priority
+              let priority = 'priority: medium'; // default
+              if (labels.includes('priority: urgent')) priority = 'priority: urgent';
+              else if (labels.includes('priority: high')) priority = 'priority: high';
+              else if (labels.includes('priority: low')) priority = 'priority: low';
+
+              // Check response time (if still "new")
+              if (labels.includes('status: new')) {
+                const responseDeadline = SLA.response[priority];
+                const hoursUntilDeadline = responseDeadline - ageHours;
+
+                if (hoursUntilDeadline < 0) {
+                  // Overdue on response
+                  console.log(`Issue #${issue.number} is overdue for response (${Math.abs(hoursUntilDeadline).toFixed(1)}h past deadline)`);
+
+                  if (!labels.includes('overdue')) {
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      labels: ['overdue']
+                    });
+
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `⚠️ **Response Overdue**\n\nThis ticket has not been acknowledged within the expected ${responseDeadline} hour timeframe.\n\n@${officerUsername} - Please review and acknowledge this ticket.\n\n*Business hours: Mon-Fri, 9 AM - 5 PM SGT*`
+                    });
+                  }
+                } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {
+                  // At risk - approaching deadline
+                  if (!labels.includes('at-risk') && !labels.includes('overdue')) {
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      labels: ['at-risk']
+                    });
+                    console.log(`Issue #${issue.number} is at-risk (${hoursUntilDeadline.toFixed(1)}h until deadline)`);
+                  }
+                }
+              }
+
+              // Check resolution time (if in-progress)
+              if (labels.includes('status: in-progress') || labels.includes('status: acknowledged')) {
+                const resolutionDeadline = SLA.resolution[priority];
+                const hoursUntilDeadline = resolutionDeadline - ageHours;
+
+                if (hoursUntilDeadline < 0) {
+                  // Overdue on resolution
+                  console.log(`Issue #${issue.number} is overdue for resolution (${Math.abs(hoursUntilDeadline).toFixed(1)}h past deadline)`);
+
+                  if (!labels.includes('overdue')) {
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      labels: ['overdue']
+                    });
+
+                    const daysPast = Math.abs(hoursUntilDeadline / 24).toFixed(1);
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `⏰ **Resolution Overdue**\n\nThis ticket has exceeded the expected resolution timeframe by ${daysPast} days.\n\n@${officerUsername} - Please provide an update on progress.\n\n*Expected resolution: ${resolutionDeadline} hours (~${(resolutionDeadline/24).toFixed(1)} days)*`
+                    });
+                  }
+                } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {
+                  // At risk
+                  if (!labels.includes('at-risk') && !labels.includes('overdue')) {
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      labels: ['at-risk']
+                    });
+                    console.log(`Issue #${issue.number} is at-risk for resolution (${hoursUntilDeadline.toFixed(1)}h until deadline)`);
+                  }
+                }
+              }
+
+              // Remove at-risk label if issue is no longer at risk
+              if (labels.includes('at-risk')) {
+                const responseDeadline = SLA.response[priority];
+                const resolutionDeadline = SLA.resolution[priority];
+                const responseHoursLeft = responseDeadline - ageHours;
+                const resolutionHoursLeft = resolutionDeadline - ageHours;
+
+                // If moved past at-risk stage (either resolved or way past deadline)
+                if (labels.includes('status: resolved') || labels.includes('status: closed') ||
+                    (responseHoursLeft > 24 && resolutionHoursLeft > 24)) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    name: 'at-risk'
+                  }).catch(() => {}); // Ignore if label doesn't exist
+                }
+              }
+            }
+
+            console.log('Deadline check complete!');
