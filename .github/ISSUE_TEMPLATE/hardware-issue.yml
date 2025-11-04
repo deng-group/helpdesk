@@ -1,0 +1,132 @@
+name: 🖥️ Hardware Issue
+description: Report problems with computers, printers, or other equipment
+title: "[Hardware] "
+labels: ["status: new", "category: hardware"]
+assignees:
+  - Tim-Pook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Hardware Support Request
+        Thank you for submitting a hardware issue. Please provide as much detail as possible to help us resolve your issue quickly.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical research operations affected)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: equipment-type
+    attributes:
+      label: Equipment Type
+      description: What type of hardware is affected?
+      options:
+        - Desktop Computer
+        - Laptop
+        - Server/Workstation
+        - Printer
+        - Monitor/Display
+        - Network Equipment
+        - Storage Device
+        - Peripheral (Mouse, Keyboard, etc.)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: equipment-location
+    attributes:
+      label: Equipment Location
+      description: Where is the equipment located? (e.g., Lab 3, Office 205, Home)
+      placeholder: "Lab 3, Desk 5"
+    validations:
+      required: true
+
+  - type: input
+    id: equipment-id
+    attributes:
+      label: Equipment ID or Name
+      description: If known, provide the equipment ID, hostname, or name
+      placeholder: "workstation-5, LAB-PC-003"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: What's wrong? Please be as specific as possible.
+      placeholder: "Computer won't turn on. Pressed power button multiple times, no lights or sounds."
+    validations:
+      required: true
+
+  - type: textarea
+    id: when-started
+    attributes:
+      label: When did this start?
+      description: When did you first notice the problem?
+      placeholder: "Started this morning around 9 AM. Worked fine yesterday."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried to fix the problem?
+      placeholder: |
+        - Tried restarting the computer
+        - Checked power cable connections
+        - Tested different power outlet
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot work at all (completely blocked)
+        - Significantly slowed down (have workaround but inefficient)
+        - Minor inconvenience (can work normally with minor adjustments)
+    validations:
+      required: true
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg or +65 XXXX XXXX"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details, photos, or information
+      placeholder: "Attach photos if helpful. Note any recent changes to the equipment."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have tried restarting the equipment
+        - label: I have checked all cable connections
+        - label: I have checked if this is in the FAQ
+        - label: I have searched for similar existing issues

@@ -186,6 +186,7 @@ jobs:
                 continue; // Skip to next issue
               }
 
+
               // Skip if manual override/exception labels are present
               const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay'];
               const hasOverride = overrideLabels.some(label => labels.includes(label));

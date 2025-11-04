@@ -1,0 +1,184 @@
+name: 🌐 Network Issue
+description: Report connectivity or network problems
+title: "[Network] "
+labels: ["status: new", "category: network"]
+assignees:
+  - Tim-Pook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Network Issue
+        Having trouble with network connectivity? Please describe the problem.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical research operations affected)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of network problem are you experiencing?
+      options:
+        - No Internet Connection
+        - Slow/Intermittent Connection
+        - Cannot Connect to VPN
+        - Cannot Access Lab Network
+        - Cannot Access Specific Server/Resource
+        - Wi-Fi Issues
+        - Ethernet/Wired Connection Issues
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device-type
+    attributes:
+      label: Device Type
+      description: What device are you using?
+      options:
+        - Personal Laptop
+        - Lab Desktop/Workstation
+        - Server
+        - Mobile Device
+        - Multiple Devices
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Where are you experiencing this issue?
+      placeholder: "Lab 3, Office 205, Working from home"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connection-type
+    attributes:
+      label: Connection Type
+      description: How are you trying to connect?
+      options:
+        - Wi-Fi (Wireless)
+        - Ethernet (Wired)
+        - VPN
+        - Both Wi-Fi and Ethernet
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: Describe the network issue in detail
+      placeholder: "Cannot connect to the lab Wi-Fi network. Network appears in the list but connection times out."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: when-occurs
+    attributes:
+      label: When does this occur?
+      description: Is this a constant or intermittent problem?
+      options:
+        - Always (constant problem)
+        - Intermittently (comes and goes)
+        - Only at specific times (specify below)
+        - Just started today
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-resources
+    attributes:
+      label: Affected Resources
+      description: What specific resources can't you access?
+      placeholder: "Cannot access lab server at lab-server-1.nus.edu.sg, but can access general internet."
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-messages
+    attributes:
+      label: Error Messages
+      description: Any error messages you're seeing?
+      placeholder: "Connection timeout, DNS error, 'Network unreachable'"
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried to fix the problem?
+      placeholder: |
+        - Restarted computer
+        - Turned Wi-Fi off and on
+        - Disconnected and reconnected VPN
+        - Tried different Wi-Fi network
+    validations:
+      required: false
+
+  - type: dropdown
+    id: other-devices
+    attributes:
+      label: Other Devices Affected?
+      description: Do other devices have the same problem?
+      options:
+        - "Yes, other devices also affected"
+        - "No, only this device"
+        - "Haven't tested other devices"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot work at all (completely blocked)
+        - Significantly slowed down (have workaround but inefficient)
+        - Minor inconvenience (can work normally with minor adjustments)
+    validations:
+      required: true
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details
+      placeholder: "This started after the recent network maintenance last week."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have tried restarting my device
+        - label: I have checked my VPN connection (if applicable)
+        - label: I have verified cables are properly connected (if wired)
+        - label: I have checked if others are experiencing the same issue

@@ -1,0 +1,95 @@
+name: Check Leave Status
+
+on:
+  schedule:
+    # Check daily at 8 AM SGT (midnight UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-leave:
+    runs-on: ubuntu-latest
+    name: Check if leave period has ended
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check leave status and auto-update
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read officer config
+            let officerUsername = 'Tim-Pook'; // fallback
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              if (usernameMatch) {
+                officerUsername = usernameMatch[1];
+              }
+            } catch (error) {
+              console.log('Officer config not found, using default');
+            }
+
+            // Read leave config - simple text parsing
+            const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
+
+            // Parse leave status
+            const onLeave = yamlContent.includes('on_leave: true');
+            const leaveEndMatch = yamlContent.match(/leave_end:\s*["']([^"']+)["']/);
+            const leaveEnd = leaveEndMatch ? leaveEndMatch[1] : null;
+
+            const leaveConfig = {
+              on_leave: onLeave,
+              leave_end: leaveEnd
+            };
+
+            console.log('Current leave status:', leaveConfig.on_leave);
+
+            if (leaveConfig.on_leave && leaveConfig.leave_end) {
+              const now = new Date();
+              const leaveEndDate = new Date(leaveConfig.leave_end);
+
+              console.log(`Leave end date: ${leaveConfig.leave_end}`);
+              console.log(`Current date: ${now.toISOString().split('T')[0]}`);
+
+              // If leave period has ended, remind to update config
+              if (now > leaveEndDate) {
+                console.log('Leave period has ended!');
+
+                // Create a reminder issue
+                let reminderBody = 'Hi @' + officerUsername + ',\n\n';
+                reminderBody += 'Welcome back! 👋\n\n';
+                reminderBody += 'The leave period that was set to end on **' + leaveConfig.leave_end + '** has now passed.\n\n';
+                reminderBody += '**Action needed:** Please update `.github/on-leave.yml`:\n';
+                reminderBody += '1. Set `on_leave: false`\n';
+                reminderBody += '2. Clear the leave dates\n\n';
+                reminderBody += 'This will restore normal SLA tracking and remove leave notices from new tickets.\n\n';
+                reminderBody += '---\n\n';
+                reminderBody += 'To update:\n';
+                reminderBody += '```yaml\n';
+                reminderBody += 'on_leave: false\n';
+                reminderBody += 'leave_start: ""\n';
+                reminderBody += 'leave_end: ""\n';
+                reminderBody += 'leave_reason: ""\n';
+                reminderBody += '```\n\n';
+                reminderBody += 'Or if you\'ve extended your leave, update the `leave_end` date.\n\n';
+                reminderBody += '*This is an automated reminder.*';
+
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: '🔔 Reminder: Update Leave Status',
+                  body: reminderBody,
+                  labels: ['needs-attention']
+                });
+
+                console.log('Reminder issue created');
+              }
+            }

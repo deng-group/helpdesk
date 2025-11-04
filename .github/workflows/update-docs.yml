@@ -1,0 +1,75 @@
+name: Update Documentation with Officer Info
+
+on:
+  push:
+    paths:
+      - '.github/officer-config.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    name: Update officer info in documentation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update documentation files
+        run: |
+          # Read officer config
+          OFFICER_NAME=$(sed -n '/^officer:/,/^[a-z]/p' .github/officer-config.yml | grep '  name:' | sed 's/.*name: *"\([^"]*\)".*/\1/')
+          OFFICER_EMAIL=$(grep 'email:' .github/officer-config.yml | sed 's/.*email: *"\([^"]*\)".*/\1/')
+          OFFICER_USERNAME=$(grep 'github_username:' .github/officer-config.yml | sed 's/.*github_username: *"\([^"]*\)".*/\1/')
+
+          echo "Officer Name: $OFFICER_NAME"
+          echo "Officer Email: $OFFICER_EMAIL"
+          echo "Officer Username: $OFFICER_USERNAME"
+
+          # Update README.md
+          sed -i "s/Tim Pook/$OFFICER_NAME/g" README.md
+          sed -i "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" README.md
+
+          # Update CONTRIBUTING.md
+          sed -i "s/Tim Pook/$OFFICER_NAME/g" CONTRIBUTING.md
+          sed -i "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" CONTRIBUTING.md
+          # Replace standalone "Tim" with officer first name
+          OFFICER_FIRST_NAME=$(echo "$OFFICER_NAME" | awk '{print $1}')
+          sed -i "s/\bTim\b/$OFFICER_FIRST_NAME/g" CONTRIBUTING.md
+
+          # Update FAQ
+          sed -i "s/Tim Pook/$OFFICER_NAME/g" docs/faq.md
+          sed -i "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" docs/faq.md
+
+          echo "Documentation updated successfully"
+
+      - name: Check if there are changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md CONTRIBUTING.md docs/faq.md
+          git commit -m "$(cat <<'EOF'
+          Auto-update documentation with new officer info
+
+          Updated from officer-config.yml:
+          - README.md
+          - CONTRIBUTING.md
+          - docs/faq.md
+
+          🤖 Automated update
+          EOF
+          )"
+          git push

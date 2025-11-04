@@ -1,0 +1,13 @@
+# Computer Officer Configuration
+# Update this file when the computer officer changes
+
+# Current Computer Officer
+officer:
+  github_username: "Tim-Pook"
+  name: "Tim Pook"
+  email: "tim.pook@nus.edu.sg"
+
+# Group Information
+group:
+  name: "DENG Group"
+  pi_name: "Prof. Zeyu Deng"

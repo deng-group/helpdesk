@@ -1,0 +1,134 @@
+name: Stale Ticket Management
+
+on:
+  schedule:
+    # Run daily at 10 AM SGT (2 AM UTC)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  manage-stale:
+    runs-on: ubuntu-latest
+    name: Manage stale tickets
+
+    steps:
+      - name: Check for stale tickets
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const DAYS_UNTIL_STALE = 7;      // Mark as stale after 7 days
+            const DAYS_UNTIL_CLOSE = 14;     // Close after 14 days of inactivity
+
+            // Get all open issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            console.log(`Checking ${issues.data.length} open issues for staleness`);
+
+            for (const issue of issues.data) {
+              // Skip pull requests
+              if (issue.pull_request) continue;
+
+              const labels = issue.labels.map(l => l.name);
+              const updatedAt = new Date(issue.updated_at);
+              const daysSinceUpdate = (now - updatedAt) / (1000 * 60 * 60 * 24);
+
+              // Only check tickets waiting for user response
+              if (labels.includes('status: waiting-for-user')) {
+
+                if (daysSinceUpdate >= DAYS_UNTIL_CLOSE) {
+                  // Close stale tickets after 14 days
+                  console.log(`Closing stale issue #${issue.number} (${daysSinceUpdate.toFixed(1)} days inactive)`);
+
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: `👋 **Auto-closing due to inactivity**\n\nThis ticket has been waiting for your response for ${Math.floor(daysSinceUpdate)} days without activity.\n\nIf you still need help, no problem! Just comment here to reopen the ticket, or [create a new one](../../issues/new/choose).\n\nThank you!`
+                  });
+
+                  // Add stale label and close
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: ['stale']
+                  });
+
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                    state_reason: 'not_planned'
+                  });
+
+                } else if (daysSinceUpdate >= DAYS_UNTIL_STALE && !labels.includes('stale')) {
+                  // Warn after 7 days
+                  console.log(`Marking issue #${issue.number} as stale (${daysSinceUpdate.toFixed(1)} days inactive)`);
+
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: ['stale']
+                  });
+
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: `⏰ **Stale ticket warning**\n\nThis ticket has been waiting for your response for ${Math.floor(daysSinceUpdate)} days.\n\nIf we don't hear back within ${DAYS_UNTIL_CLOSE - DAYS_UNTIL_STALE} days, this ticket will be automatically closed. You can always reopen it later if needed.\n\nPlease reply if you still need help!`
+                  });
+                }
+              }
+
+              // Auto-close resolved tickets after 48 hours of no response
+              if (labels.includes('status: resolved')) {
+                const HOURS_UNTIL_AUTO_CLOSE = 48;
+                const hoursSinceUpdate = (now - updatedAt) / (1000 * 60 * 60);
+
+                if (hoursSinceUpdate >= HOURS_UNTIL_AUTO_CLOSE) {
+                  console.log(`Auto-closing resolved issue #${issue.number} (${hoursSinceUpdate.toFixed(1)} hours since resolved)`);
+
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    body: `✅ **Auto-closing resolved ticket**\n\nThis ticket was marked as resolved ${Math.floor(hoursSinceUpdate)} hours ago with no further response.\n\nIf the issue persists, please comment here to reopen, or [create a new ticket](../../issues/new/choose).\n\nThank you!`
+                  });
+
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                    state_reason: 'completed',
+                    labels: labels.filter(l => l !== 'status: resolved').concat(['status: closed'])
+                  });
+                }
+              }
+
+              // Remove stale label if user has responded
+              if (labels.includes('stale') && !labels.includes('status: waiting-for-user')) {
+                console.log(`Removing stale label from issue #${issue.number} (user responded)`);
+
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: 'stale'
+                }).catch(() => {}); // Ignore if label doesn't exist
+              }
+            }
+
+            console.log('Stale ticket check complete!');

@@ -1,0 +1,200 @@
+name: ⚡ Computing Resources
+description: Issues with HPC, servers, or computing cluster resources
+title: "[Compute] "
+labels: ["status: new", "category: compute"]
+assignees:
+  - Tim-Pook
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Computing Resources Support
+        Having issues with HPC systems, servers, or computing clusters? Let us help.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - Low (can wait a week)
+        - Medium (needed within a few days)
+        - High (blocking my work)
+        - Urgent (critical deadline or system down)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of help do you need?
+      options:
+        - Job Won't Run / Submit
+        - Job Stuck / Not Completing
+        - Performance Issue (very slow)
+        - Resource Allocation (need more CPU/GPU/memory)
+        - Access Issue (cannot login or connect)
+        - Software/Environment Issue
+        - Queue/Scheduling Issue
+        - Results/Output Issue
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: system-name
+    attributes:
+      label: System/Cluster Name
+      description: Which computing system are you using?
+      placeholder: "HPC cluster, lab-server-1, GPU workstation"
+    validations:
+      required: true
+
+  - type: input
+    id: job-id
+    attributes:
+      label: Job ID (if applicable)
+      description: If you have a job ID, provide it here
+      placeholder: "12345, job_20231015_001"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: Problem Description
+      description: Describe the issue you're experiencing
+      placeholder: "My job has been queued for 3 days but hasn't started running yet."
+    validations:
+      required: true
+
+  - type: textarea
+    id: command-used
+    attributes:
+      label: Command or Script
+      description: What command or script are you running?
+      placeholder: |
+        sbatch my_job.sh
+        or
+        python train_model.py --epochs 100
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error Message
+      description: Copy and paste any error messages
+      placeholder: "Paste error messages or attach screenshots"
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: resources-requested
+    attributes:
+      label: Resources Requested
+      description: What resources did you request?
+      placeholder: "4 CPUs, 32GB RAM, 1 GPU, 24 hours"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: when-started
+    attributes:
+      label: When did this start?
+      description: When did you first notice this issue?
+      options:
+        - Today
+        - Yesterday
+        - This week
+        - Ongoing issue
+        - First time using the system
+    validations:
+      required: true
+
+  - type: dropdown
+    id: worked-before
+    attributes:
+      label: Did this work before?
+      description: Has this same job/script worked in the past?
+      options:
+        - "Yes, it worked before"
+        - "No, first time trying this"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-taken
+    attributes:
+      label: Steps Already Taken
+      description: What have you tried to fix the problem?
+      placeholder: |
+        - Checked queue status with squeue
+        - Verified input files exist
+        - Tried reducing resources requested
+        - Checked error logs
+    validations:
+      required: false
+
+  - type: input
+    id: file-location
+    attributes:
+      label: Relevant File Location
+      description: Where are your job scripts/data located?
+      placeholder: "/home/username/jobs/experiment1/"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact on Work
+      description: How is this affecting your work?
+      options:
+        - Cannot work at all (completely blocked)
+        - Significantly slowed down (have workaround but inefficient)
+        - Minor inconvenience (can work normally with minor adjustments)
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline (if any)
+      description: Do you have a specific deadline?
+      placeholder: "Need results by Friday for paper submission"
+    validations:
+      required: false
+
+  - type: input
+    id: contact-info
+    attributes:
+      label: Contact Information
+      description: Email or phone number (if different from GitHub profile)
+      placeholder: "your.email@nus.edu.sg"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant details
+      placeholder: "This is for training a deep learning model that usually takes 48 hours to complete."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked the queue/system status
+        - label: I have verified my input files and paths are correct
+        - label: I have checked the error logs (if available)
+        - label: I have searched for similar issues
