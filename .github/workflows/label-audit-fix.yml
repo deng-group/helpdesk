@@ -68,7 +68,9 @@ jobs:
               let issueLog = [];
 
               // Check 1: Remove overdue/at-risk from long-term projects
-              if (labels.includes('category: long-term')) {
+              // Detect long-term projects by title [Long-term] or category label
+              const isLongTerm = issue.title.includes('[Long-term]') || labels.includes('category: long-term');
+              if (isLongTerm) {
                 if (labels.includes('overdue')) {
                   issueLog.push('  ❌ Has "overdue" but is long-term project');
                   labelsToRemove.push('overdue');

@@ -40,7 +40,8 @@ jobs:
             });
 
             // Filter out pull requests and long-term projects
-            const isLongTerm = (issue) => issue.labels.some(l => l.name === 'category: long-term');
+            // Detect long-term projects by [Long-term] in title or category label
+            const isLongTerm = (issue) => issue.title.includes('[Long-term]') || issue.labels.some(l => l.name === 'category: long-term');
             const issues = allIssues.data.filter(i => !i.pull_request && !isLongTerm(i));
 
             // Calculate metrics (excluding long-term projects)

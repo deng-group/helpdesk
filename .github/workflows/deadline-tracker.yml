@@ -168,7 +168,9 @@ jobs:
               const labels = issue.labels.map(l => l.name);
 
               // Skip long-term projects (they have flexible deadlines)
-              if (labels.includes('category: long-term')) {
+              // Detect by [Long-term] in title or category label
+              const isLongTerm = issue.title.includes('[Long-term]') || labels.includes('category: long-term');
+              if (isLongTerm) {
                 console.log(`Issue #${issue.number} is a long-term project - skipping SLA checks`);
 
                 // Remove overdue/at-risk labels if present on long-term projects
