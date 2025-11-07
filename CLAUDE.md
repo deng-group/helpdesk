@@ -167,7 +167,7 @@ Issue templates are located in `.github/ISSUE_TEMPLATE/` and provide structured 
 - `procurement.yml` - Equipment/software purchases
 - `long-term-task.yml` - Multi-week projects for officer
 
-**Note:** Templates were intentionally simplified from 10-15 fields down to 3-4 fields to encourage completion. Users can provide additional context in the optional "Additional Details" field.
+**Note:** Templates were intentionally simplified from 10-15 fields down to 3-4 fields to encourage completion. This follows the principle of **conciseness over comprehensiveness** - capture essential info quickly, let users add details if needed.
 
 ### Automated Label Management
 
@@ -346,13 +346,19 @@ To create sub-issues properly:
 
 ## Documentation Structure
 
-- `README.md` - User-facing help desk documentation
-- `CONTRIBUTING.md` - Guide for users on writing good tickets
+- `README.md` - User-facing help desk documentation (keep concise, ~200-300 lines)
+- `CONTRIBUTING.md` - Guide for users on writing good tickets (keep brief)
 - `docs/officer-guide.md` - Operational guide for the computer officer (day-to-day procedures)
 - `docs/deadline-and-reporting-system.md` - Comprehensive technical reference for SLA and reporting systems
-- `docs/faq.md` - Frequently asked questions
+- `docs/faq.md` - Frequently asked questions (short answers preferred)
 - `.github/officer-config.yml` - Officer contact information (used by workflows)
 - `.github/on-leave.yml` - Officer availability status
+
+**Documentation Philosophy:**
+- **Concise over comprehensive** - Users prefer short, scannable docs
+- **Examples over explanations** - Show, don't tell
+- **Remove redundancy** - Don't repeat what's in other files
+- **Progressive disclosure** - Basic info first, details in expandable sections or separate files
 
 ## Testing Changes
 

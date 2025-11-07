@@ -152,7 +152,7 @@ The report is posted as a new GitHub issue with the `report` label.
 - **New Tickets:** Created in the past 7 days (excludes long-term projects)
 - **Closed Tickets:** Closed in the past 7 days (excludes long-term projects)
 - **Currently Open:** All open tickets right now (excludes long-term projects)
-- **Long-term Projects:** Tickets with `category: long-term` label
+- **Long-term Projects:** Issues with `[Long-term]` in title or `category: long-term` label
 - **Exceptions & Complex:** Tickets with override labels (see below)
 - **Overdue:** Tickets with `overdue` label (excludes exceptions)
 
@@ -284,12 +284,12 @@ Lists all tickets **closed in the past 7 days**.
 ```
 
 **What's included:**
-- All open tickets with `category: long-term` label
+- All open tickets with `[Long-term]` in title or `category: long-term` label
 - Shows how long they've been active (days/weeks/months)
 - Shows current status
 - **Sorted by longest active first**
 
-**Note:** Long-term projects are **completely separate** from normal ticket tracking. They don't count toward "Currently Open" or overdue metrics.
+**Note:** Long-term projects are **completely separate** from normal ticket tracking. They don't count toward "Currently Open" or overdue metrics. Detection is automatic based on title prefix.
 
 #### 9. Insights
 
@@ -317,10 +317,11 @@ Lists all tickets **closed in the past 7 days**.
 The following tickets are **completely exempt** from SLA enforcement and will **never** be marked `overdue` or `at-risk`:
 
 #### 1. Long-term Projects
-- **Label:** `category: long-term`
+- **Detection:** Issues with `[Long-term]` in title OR `category: long-term` label
 - **Why:** Have flexible deadlines (weeks/months), tracked separately
 - **Duration options:** 1-2 weeks, 2-4 weeks, 1-2 months, 2-3 months, 3-6 months, 6+ months, Ongoing
-- **Created via:** Long-term Task template
+- **Created via:** Long-term Task template (auto-adds title prefix)
+- **Note:** Detection is automatic based on title - no manual labeling required
 
 #### 2. Procurement Tickets - SPECIAL CASE ⚠️
 - **Label:** `category: procurement`
