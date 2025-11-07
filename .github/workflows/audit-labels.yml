@@ -1,6 +1,9 @@
 name: Label Audit and Fix
 
 on:
+  schedule:
+    # Never runs automatically - use workflow_dispatch instead
+    - cron: '0 0 31 2 *'  # Feb 31st (never happens)
   workflow_dispatch:
     inputs:
       dry_run:
