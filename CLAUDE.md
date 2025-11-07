@@ -346,11 +346,11 @@ To create sub-issues properly:
 
 ## Documentation Structure
 
-- `README.md` - User-facing help desk documentation (keep concise, ~200-300 lines)
-- `CONTRIBUTING.md` - Guide for users on writing good tickets (keep brief)
-- `docs/officer-guide.md` - Operational guide for the computer officer (day-to-day procedures)
-- `docs/deadline-and-reporting-system.md` - Comprehensive technical reference for SLA and reporting systems
-- `docs/faq.md` - Frequently asked questions (short answers preferred)
+- `README.md` - User-facing help desk documentation (~80 lines)
+- `CONTRIBUTING.md` - Guide for users on writing good tickets (~80 lines)
+- `docs/faq.md` - Frequently asked questions with quick answers (~125 lines)
+- `docs/officer-workflow.md` - Daily workflow and ticket handling for officer (~100 lines)
+- `docs/sla-reference.md` - SLA times and deadline tracking reference (~60 lines)
 - `.github/officer-config.yml` - Officer contact information (used by workflows)
 - `.github/on-leave.yml` - Officer availability status
 

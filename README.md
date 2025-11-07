@@ -74,6 +74,6 @@ For **critical emergencies** outside normal hours:
 **GitHub:** [@Tim-Pook](https://github.com/Tim-Pook)
 
 **Helpful Links:**
-- [FAQ](docs/faq.md) - Common questions
-- [How to Write Good Tickets](CONTRIBUTING.md) - Tips for clear requests
-- [SLA Details](docs/deadline-and-reporting-system.md) - Response time details
+- [FAQ](docs/faq.md) - Common questions and quick fixes
+- [Contributing Guide](CONTRIBUTING.md) - Tips for writing good tickets
+- [SLA Reference](docs/sla-reference.md) - Detailed response time info
