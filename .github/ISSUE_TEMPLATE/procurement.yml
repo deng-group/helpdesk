@@ -10,160 +10,33 @@ body:
     attributes:
       value: |
         ## Procurement Request
-        Use this template for purchasing equipment, software licenses, or services.
+        Request for purchasing equipment, software, or services.
 
-        **Note:** Procurement typically takes 4-8 weeks due to approval, vendor coordination, and delivery times. Plan ahead!
-
-  - type: dropdown
-    id: procurement-type
-    attributes:
-      label: Procurement Type
-      description: What are you requesting to purchase?
-      options:
-        - Hardware (computers, servers, peripherals)
-        - Software License (new purchase)
-        - Software License (renewal)
-        - Service/Subscription (cloud services, support contracts)
-        - Consumables (cables, accessories, supplies)
-        - Other
-    validations:
-      required: true
+        **Note:** Procurement typically takes 4-8 weeks. Plan ahead!
 
   - type: textarea
-    id: item-description
+    id: item
     attributes:
-      label: Item Description
-      description: What needs to be purchased?
-      placeholder: |
-        - Item name and model/version
-        - Quantity needed
-        - Specific requirements or specifications
+      label: What needs to be purchased?
+      description: Item name, quantity, and specifications
+      placeholder: "2x Dell Workstation with 64GB RAM, NVIDIA RTX 4090"
     validations:
       required: true
 
   - type: textarea
     id: justification
     attributes:
-      label: Justification
-      description: Why is this purchase needed?
-      placeholder: |
-        - What problem does this solve?
-        - How will it be used?
-        - Who will use it?
-        - Impact if not purchased?
-    validations:
-      required: true
-
-  - type: input
-    id: estimated-cost
-    attributes:
-      label: Estimated Cost
-      description: Approximate cost (including any recurring fees)
-      placeholder: "SGD $XXX (one-time) or SGD $XXX/year"
-    validations:
-      required: true
-
-  - type: input
-    id: budget-source
-    attributes:
-      label: Budget Source
-      description: Which budget should this be charged to?
-      placeholder: "Research grant ABC123, Department budget, Lab operating funds"
-    validations:
-      required: false
-
-  - type: dropdown
-    id: urgency
-    attributes:
-      label: Urgency
-      description: How soon is this needed?
-      options:
-        - Low (can wait 3+ months)
-        - Medium (needed within 2-3 months)
-        - High (needed within 1 month)
-        - Urgent (needed within 2 weeks - rare, requires strong justification)
-    validations:
-      required: true
-
-  - type: input
-    id: deadline
-    attributes:
-      label: Deadline / Target Date
-      description: When does this need to be in place? (Note - procurement typically takes 4-8 weeks)
-      placeholder: "Before conference in March, Start of new semester (August)"
-    validations:
-      required: false
-
-  - type: dropdown
-    id: approval-status
-    attributes:
-      label: Approval Status
-      description: Has this been approved by PI/supervisor?
-      options:
-        - Not yet (needs approval)
-        - Approved by PI
-        - Approved by department
-        - Budget already allocated
+      label: Why is this needed?
+      description: Brief justification for the purchase
+      placeholder: "For deep learning model training. Current workstations are insufficient."
     validations:
       required: true
 
   - type: textarea
-    id: vendor-info
+    id: additional-info
     attributes:
-      label: Vendor / Supplier Information
-      description: Do you have preferred vendor or quotes?
-      placeholder: |
-        - Preferred vendor: XYZ Company
-        - Quote attached: [link]
-        - Alternative vendors considered: ABC Corp, DEF Inc
-    validations:
-      required: false
-
-  - type: textarea
-    id: technical-requirements
-    attributes:
-      label: Technical Requirements
-      description: Any specific technical requirements or compatibility needs?
-      placeholder: |
-        - Must be compatible with existing systems
-        - Required specs: RAM, CPU, etc.
-        - Integration with current infrastructure
-    validations:
-      required: false
-
-  - type: dropdown
-    id: recurring-cost
-    attributes:
-      label: Has Recurring Costs?
-      description: Will there be ongoing costs (subscriptions, maintenance)?
-      options:
-        - "No"
-        - "Yes - Annual"
-        - "Yes - Monthly"
-    validations:
-      required: true
-
-  - type: textarea
-    id: additional-notes
-    attributes:
-      label: Additional Notes
+      label: Additional Details (optional)
       description: Any other relevant information
-      placeholder: |
-        - Related to ongoing project X
-        - Replacement for old equipment Y
-        - Coordinate with department purchasing office
+      placeholder: "Budget, preferred vendor, timeline, grant number, etc."
     validations:
       required: false
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Pre-submission Checklist
-      description: Please confirm before submitting
-      options:
-        - label: I have discussed this purchase with my PI/supervisor
-          required: false
-        - label: I have checked if similar items already exist in the lab
-          required: false
-        - label: I have considered alternatives and this is the best option
-          required: false
