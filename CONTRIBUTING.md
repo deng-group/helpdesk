@@ -56,10 +56,11 @@ Thank you for using the help desk! This guide covers how to be a good community 
 
 | Priority | First Response | Resolution |
 |----------|---------------|------------|
-| Urgent | Same day | Same day - 1 day |
-| High | Same day | 2-3 days |
+| Urgent | Within 4 hours | Same day |
+| High | Within 4 hours | 2-3 days |
 | Medium | Within 1 day | 3-5 days |
 | Low | Within 2 days | 5-7 days |
+| Procurement | Within 2 days | 6 weeks |
 
 **Guidelines during business hours (Mon-Fri, 9 AM - 5 PM SGT)**
 

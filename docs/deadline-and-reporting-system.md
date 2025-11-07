@@ -21,16 +21,30 @@ The deadline tracker runs automatically **every day at 9 AM SGT** via GitHub Act
 
 ### SLA Timeframes
 
+#### Standard SLA (Priority-Based)
+
 Deadlines are calculated based on the ticket's **priority label** and **creation time**:
 
 | Priority | Response Time | Resolution Time |
 |----------|---------------|-----------------|
-| `priority: urgent` | 2 hours | 8 hours |
+| `priority: urgent` | 4 hours | 8 hours |
 | `priority: high` | 4 hours | 72 hours (3 days) |
 | `priority: medium` | 24 hours | 120 hours (5 days) |
 | `priority: low` | 48 hours | 168 hours (7 days) |
 
 **Default Priority:** If no priority label is set, `priority: medium` is assumed.
+
+#### Procurement SLA (Category-Based)
+
+**All procurement tickets** (`category: procurement`) automatically use extended timeframes:
+
+| Ticket Type | Response Time | Resolution Time |
+|-------------|---------------|-----------------|
+| `category: procurement` | 48 hours (2 days) | 1008 hours (6 weeks) |
+
+**Why different?** Procurement typically involves a 4-8 week process: approval → ordering → delivery → setup. The extended SLA reflects this reality.
+
+**Note:** Procurement SLA overrides the priority label. Even if a procurement ticket is marked `priority: urgent`, it still uses the 6-week resolution timeframe. If you need faster procurement, add a manual override label and explain in comments.
 
 ### Deadline Stages
 
@@ -43,8 +57,10 @@ Deadlines are calculated based on the ticket's **priority label** and **creation
 ```
 Ticket created: Monday 10:00 AM
 Priority: high (4-hour response SLA)
-Response deadline: Monday 2:00 PM
+Response deadline: Monday 2:00 PM (same for urgent priority)
 ```
+
+**Note:** Urgent and high priority now have the same 4-hour response SLA for business hours realism.
 
 #### 2. Resolution Deadline
 - **Applies to:** Tickets with `status: in-progress` or `status: acknowledged`
@@ -63,8 +79,10 @@ Resolution deadline: Thursday 10:00 AM
 The deadline tracker automatically applies these labels:
 
 #### `at-risk` Label
-- Applied when **less than 24 hours** remain until deadline
-- Serves as an early warning
+- Applied when approaching deadline (early warning)
+- **For standard tickets:** Less than 24 hours remain until resolution deadline
+- **For procurement tickets:** Less than 1 week (168 hours) remains until resolution deadline
+- **For response deadlines:** Always 24 hours threshold (all ticket types)
 - Can be on response OR resolution deadline
 - **No notification sent** - just a visual indicator
 
@@ -304,7 +322,13 @@ The following tickets are **completely exempt** from SLA enforcement and will **
 - **Duration options:** 1-2 weeks, 2-4 weeks, 1-2 months, 2-3 months, 3-6 months, 6+ months, Ongoing
 - **Created via:** Long-term Task template
 
-#### 2. Override Labels
+#### 2. Procurement Tickets - SPECIAL CASE ⚠️
+- **Label:** `category: procurement`
+- **NOT exempt** - they use **extended SLA** instead (48h response, 6 weeks resolution)
+- Can still get `overdue` or `at-risk` labels if these extended deadlines are missed
+- **No manual override needed** - extended timeframe is automatic
+
+#### 3. Override Labels
 Any ticket with one of these labels is exempt:
 
 **`sla-exception`**

@@ -132,7 +132,7 @@ jobs:
             // Define SLA timeframes (in hours)
             const SLA = {
               response: {
-                'priority: urgent': 2,
+                'priority: urgent': 4,   // Changed from 2 to 4 hours for business hours realism
                 'priority: high': 4,
                 'priority: medium': 24,
                 'priority: low': 48
@@ -143,6 +143,12 @@ jobs:
                 'priority: medium': 120, // 5 days
                 'priority: low': 168     // 7 days
               }
+            };
+
+            // Special SLA for procurement tickets (4-8 week typical timeline)
+            const PROCUREMENT_SLA = {
+              response: 48,        // 48 hours - same as low priority
+              resolution: 1008     // 6 weeks (42 days)
             };
 
             // Get all open issues
@@ -224,9 +230,22 @@ jobs:
               else if (labels.includes('priority: high')) priority = 'priority: high';
               else if (labels.includes('priority: low')) priority = 'priority: low';
 
+              // Check if this is a procurement ticket (uses different SLA)
+              const isProcurement = labels.includes('category: procurement');
+              let responseDeadlineSLA, resolutionDeadlineSLA;
+
+              if (isProcurement) {
+                responseDeadlineSLA = PROCUREMENT_SLA.response;
+                resolutionDeadlineSLA = PROCUREMENT_SLA.resolution;
+                console.log(`Issue #${issue.number} is procurement - using extended SLA (${responseDeadlineSLA}h response, ${resolutionDeadlineSLA}h resolution)`);
+              } else {
+                responseDeadlineSLA = SLA.response[priority];
+                resolutionDeadlineSLA = SLA.resolution[priority];
+              }
+
               // Check response time (if still "new")
               if (labels.includes('status: new')) {
-                const responseDeadline = SLA.response[priority];
+                const responseDeadline = responseDeadlineSLA;
                 const hoursUntilDeadline = responseDeadline - ageHours;
 
                 if (hoursUntilDeadline < 0) {
@@ -249,7 +268,7 @@ jobs:
                     });
                   }
                 } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {
-                  // At risk - approaching deadline
+                  // At risk - approaching deadline (response uses 24h threshold for all types)
                   if (!labels.includes('at-risk') && !labels.includes('overdue')) {
                     await github.rest.issues.addLabels({
                       owner: context.repo.owner,
@@ -264,7 +283,7 @@ jobs:
 
               // Check resolution time (if in-progress)
               if (labels.includes('status: in-progress') || labels.includes('status: acknowledged')) {
-                const resolutionDeadline = SLA.resolution[priority];
+                const resolutionDeadline = resolutionDeadlineSLA;
                 const hoursUntilDeadline = resolutionDeadline - ageHours;
 
                 if (hoursUntilDeadline < 0) {
@@ -287,30 +306,37 @@ jobs:
                       body: `⏰ **Resolution Overdue**\n\nThis ticket has exceeded the expected resolution timeframe by ${daysPast} days.\n\n@${officerUsername} - Please provide an update on progress.\n\n*Expected resolution: ${resolutionDeadline} hours (~${(resolutionDeadline/24).toFixed(1)} days)*`
                     });
                   }
-                } else if (hoursUntilDeadline < 24 && hoursUntilDeadline > 0) {
-                  // At risk
-                  if (!labels.includes('at-risk') && !labels.includes('overdue')) {
-                    await github.rest.issues.addLabels({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      issue_number: issue.number,
-                      labels: ['at-risk']
-                    });
-                    console.log(`Issue #${issue.number} is at-risk for resolution (${hoursUntilDeadline.toFixed(1)}h until deadline)`);
+                } else {
+                  // At risk - approaching deadline
+                  // Use proportional threshold: 1 week for procurement (168h), 24h for others
+                  const atRiskThreshold = isProcurement ? 168 : 24;
+
+                  if (hoursUntilDeadline < atRiskThreshold && hoursUntilDeadline > 0) {
+                    if (!labels.includes('at-risk') && !labels.includes('overdue')) {
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issue.number,
+                        labels: ['at-risk']
+                      });
+                      const daysUntil = (hoursUntilDeadline / 24).toFixed(1);
+                      console.log(`Issue #${issue.number} is at-risk for resolution (${daysUntil} days until deadline)`);
+                    }
                   }
                 }
               }
 
               // Remove at-risk label if issue is no longer at risk
               if (labels.includes('at-risk')) {
-                const responseDeadline = SLA.response[priority];
-                const resolutionDeadline = SLA.resolution[priority];
+                const responseDeadline = responseDeadlineSLA;
+                const resolutionDeadline = resolutionDeadlineSLA;
                 const responseHoursLeft = responseDeadline - ageHours;
                 const resolutionHoursLeft = resolutionDeadline - ageHours;
+                const atRiskThreshold = isProcurement ? 168 : 24;
 
                 // If moved past at-risk stage (either resolved or way past deadline)
                 if (labels.includes('status: resolved') || labels.includes('status: closed') ||
-                    (responseHoursLeft > 24 && resolutionHoursLeft > 24)) {
+                    (responseHoursLeft > 24 && resolutionHoursLeft > atRiskThreshold)) {
                   await github.rest.issues.removeLabel({
                     owner: context.repo.owner,
                     repo: context.repo.repo,

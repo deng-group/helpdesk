@@ -66,13 +66,15 @@ Change label to `acknowledged`.
 
 For purchasing tickets (equipment, software, services):
 - These typically take 4-8 weeks (approval → order → delivery → setup)
+- **Automatic extended SLA:** 48h response, 6 weeks resolution (no override label needed!)
 - Verify PI/supervisor approval before proceeding
 - Check budget source and availability
 - Get quotes from vendors if needed
 - Coordinate with department purchasing office
 - Track: approval status → order placed → delivery → setup complete
 - Update stakeholders on timeline and any delays
-- Usually `priority: low` unless there's a specific urgent deadline
+- Priority label doesn't matter - all procurement uses the same 6-week SLA
+- If it takes longer than 6 weeks, add `waiting-external` or `acknowledged-delay` label
 
 **Long-term tasks**
 
