@@ -209,6 +209,7 @@ After you submit a ticket, you can expect:
 
 **Documentation:**
 - ❓ [FAQ](docs/faq.md) - Frequently asked questions and solutions
+- ⏰ [Deadline & Reporting System](docs/deadline-and-reporting-system.md) - How deadlines are tracked and reports generated
 - 📖 [DENG Group Intranet](https://intranet.matsci.dev/Orientation/get-started) - On-boarding and computing guides
 
 **Self-Service:**

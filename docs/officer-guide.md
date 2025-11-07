@@ -118,8 +118,11 @@ Use these when the normal SLA tracking doesn't apply:
 - `waiting-external` → blocked by NUS IT, vendor, hardware delivery, etc.
 - `sla-exception` → special projects that don't fit normal support scope
 - `acknowledged-delay` → you've reviewed it and approved an extended timeline
+- `sub-issue` → a child task of a larger parent issue (auto-extends parent deadline)
 
 Don't overuse these! They're for genuinely exceptional cases. Most tickets should follow normal timeframes.
+
+> **Sub-Issues:** When you break down a complex problem into smaller tasks, label the child issues with `sub-issue` and add `Parent: #123` in the description. This automatically extends the parent's deadline and exempts the sub-issue from SLA tracking.
 
 ---
 
@@ -226,6 +229,25 @@ This is blocked by [NUS IT / vendor / hardware order]. I've [submitted ticket #1
 I'll follow up and update you when I hear back.
 
 Tim
+```
+
+**Creating a sub-issue** (when breaking down a complex problem)
+```
+Hi @username,
+
+I'm breaking this down into smaller sub-tasks to manage it better:
+
+- Sub-issue #[number]: [task 1 description]
+- Sub-issue #[number]: [task 2 description]
+
+I'll work through these and keep you updated on progress. Your parent ticket deadline has been automatically extended to accommodate this work.
+
+Tim
+```
+
+*Note: When creating the sub-issue, add this to its description:*
+```
+Parent: #[parent-issue-number]
 ```
 
 ---
@@ -356,6 +378,26 @@ Talk to Prof. Deng. Maybe we need to update the FAQ, add more automation, or get
 
 ---
 
+## System Documentation
+
+**For detailed technical information:**
+
+- 📊 **[Deadline & Reporting System](deadline-and-reporting-system.md)** - Comprehensive guide on:
+  - How SLA deadlines are calculated (response vs. resolution times)
+  - What triggers `overdue` and `at-risk` labels
+  - How the weekly report is generated
+  - What's included/excluded from tracking
+  - Override labels and exception handling
+  - Detailed examples and troubleshooting
+
+**Quick reference:**
+- SLA timeframes by priority are in the deadline tracker workflow
+- Weekly report runs every Monday at 9 AM SGT
+- Override labels: `sla-exception`, `complex-issue`, `waiting-external`, `acknowledged-delay`, `sub-issue`
+- Long-term projects and officer leave periods are completely exempt from SLA tracking
+
+---
+
 ## Questions?
 
 Update this guide with stuff you learn. It's a living document.
@@ -364,4 +406,4 @@ If something's confusing or you think the system needs changes, talk to Prof. De
 
 ---
 
-*Last updated: 2025-10-11*
+*Last updated: 2025-01-07*

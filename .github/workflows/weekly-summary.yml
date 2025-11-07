@@ -101,6 +101,35 @@ jobs:
             // Count overdue tickets
             const overdueTickets = currentlyOpen.filter(i => i.labels.some(l => l.name === 'overdue'));
 
+            // Track exceptions and complex issues (override labels)
+            const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay', 'sub-issue'];
+            const exceptionTickets = currentlyOpen.filter(i =>
+              i.labels.some(l => overrideLabels.includes(l.name))
+            ).map(issue => {
+              const overrideLabel = issue.labels.find(l => overrideLabels.includes(l.name))?.name || '';
+              const priority = issue.labels.find(l => l.name.startsWith('priority:'))?.name || 'no priority';
+              const status = issue.labels.find(l => l.name.startsWith('status:'))?.name || 'no status';
+              const createdDate = new Date(issue.created_at);
+              const daysOpen = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+
+              // For sub-issues, try to detect parent issue
+              let parentIssue = null;
+              const parentMatch = issue.body?.match(/Parent:?\s*#(\d+)/i);
+              if (parentMatch) {
+                parentIssue = parentMatch[1];
+              }
+
+              return {
+                number: issue.number,
+                title: issue.title,
+                overrideLabel,
+                priority,
+                status,
+                daysOpen,
+                parentIssue
+              };
+            });
+
             // Calculate response times for closed tickets
             let totalResponseTime = 0;
             let ticketsWithResponse = 0;
@@ -147,6 +176,7 @@ jobs:
             report += '| ✅ Closed Tickets | ' + closedThisWeek.length + ' |\n';
             report += '| 📂 Currently Open | ' + currentlyOpen.length + ' |\n';
             report += '| 📌 Long-term Projects | ' + longTermWithDuration.length + ' |\n';
+            report += '| 🔧 Exceptions & Complex | ' + exceptionTickets.length + ' |\n';
             report += '| ⚠️ Overdue | ' + overdueTickets.length + ' |\n\n';
             report += '**Net Change:** ' + (createdThisWeek.length - closedThisWeek.length > 0 ? '+' : '') + (createdThisWeek.length - closedThisWeek.length) + '\n\n';
             report += '---\n\n## ⏱️ Response Time\n\n';
@@ -157,6 +187,26 @@ jobs:
             report += (Object.keys(openByPriority).length > 0 ? Object.entries(openByPriority).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
             report += '### By Category\n';
             report += (Object.keys(openByCategory).length > 0 ? Object.entries(openByCategory).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
+            report += '---\n\n## 🔧 Exceptions & Complex Issues\n\n';
+            if (exceptionTickets.length > 0) {
+              report += '*These tickets have override labels and are exempt from normal SLA tracking:*\n\n';
+              // Sort by days open (longest first)
+              exceptionTickets.sort((a, b) => b.daysOpen - a.daysOpen);
+              report += exceptionTickets.map(t => {
+                const daysStr = t.daysOpen === 1 ? '1 day' : t.daysOpen + ' days';
+                const labelEmoji = {
+                  'sla-exception': '📋',
+                  'complex-issue': '🔍',
+                  'waiting-external': '⏳',
+                  'acknowledged-delay': '⏰',
+                  'sub-issue': '🔗'
+                }[t.overrideLabel] || '🔧';
+                const parentInfo = t.parentIssue ? ' (parent: #' + t.parentIssue + ')' : '';
+                return '- ' + labelEmoji + ' #' + t.number + ': ' + t.title + parentInfo + '\n  - **' + t.overrideLabel.replace(/-/g, ' ') + '** | ' + t.status + ' | ' + daysStr + ' open';
+              }).join('\n') + '\n\n';
+            } else {
+              report += '✅ No exception tickets this week.\n\n';
+            }
             report += '---\n\n## ⚠️ Attention Needed\n\n';
             if (overdueTickets.length > 0) {
               report += '### Overdue Tickets (' + overdueTickets.length + ')\n';
