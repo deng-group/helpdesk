@@ -81,7 +81,7 @@ jobs:
             const parentLabels = parentIssue.data.labels.map(l => l.name);
 
             // Check if parent already has an override label
-            const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay'];
+            const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay', 'sub-issue'];
             const hasOverride = overrideLabels.some(label => parentLabels.includes(label));
 
             if (hasOverride) {
