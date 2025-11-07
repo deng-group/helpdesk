@@ -44,10 +44,11 @@ The help desk operates through interconnected GitHub Actions workflows located i
 
 7. **Label Audit & Fix** (`label-audit-fix.yml`) - Manual trigger only
    - Scans all open issues for incorrectly applied labels
-   - Removes `overdue`/`at-risk` from long-term projects and override-labeled issues
+   - Removes `overdue`/`at-risk` from long-term projects (detected by `[Long-term]` title or label)
+   - Removes `overdue`/`at-risk` from issues with override labels
    - Fixes duplicate status labels (keeps most advanced status)
    - Supports dry-run mode to preview changes before applying
-   - Creates summary report issue when run in live mode
+   - Results visible in Actions logs (no summary issue created)
 
 ### SLA Enforcement System
 
@@ -111,12 +112,13 @@ The system uses structured labels across three categories:
 
 ### Ticket Categories and SLA Treatment
 
-**Long-term projects** (`category: long-term`):
+**Long-term projects** (detected by `[Long-term]` in title OR `category: long-term` label):
 - Have flexible deadlines (weeks to months)
 - **Completely exempt** from SLA tracking
 - Never get `overdue` or `at-risk` labels
 - Tracked separately in weekly reports
 - Used for infrastructure projects, documentation, system setup
+- Detection is automatic based on title prefix - no manual labeling required
 
 **Procurement tickets** (`category: procurement`):
 - Use **extended SLA**: 48h response, 6 weeks resolution
@@ -138,6 +140,34 @@ Managed via `.github/on-leave.yml`:
 - New tickets receive automated leave notices
 - Deadlines resume automatically when officer returns
 - On return, a reminder issue lists all tickets created during leave
+
+### Issue Templates
+
+Issue templates are located in `.github/ISSUE_TEMPLATE/` and provide structured forms for users to submit requests:
+
+**Design Philosophy:**
+- **Simple and concise** - Only 3-4 fields per template to maximize completion rates
+- **Flexible** - One optional "Additional Details" field for everything else
+- **Consistent** - All templates follow the same pattern
+
+**Standard Template Structure:**
+1. Priority dropdown (required) - How urgent is this?
+2. Main identifier field (required) - What/where is the issue?
+3. Problem description (required) - What's wrong or what do you need?
+4. Additional details (optional) - Catch-all for extra information
+
+**Available Templates:**
+- `general-help.yml` - Questions not covered by other categories
+- `hardware-issue.yml` - Computer/equipment problems
+- `software-support.yml` - Software installation/configuration/errors
+- `network-issue.yml` - Connectivity problems
+- `access-request.yml` - Permissions and credentials
+- `computing-resources.yml` - HPC/server/cluster issues
+- `data-storage.yml` - Storage/backup requests
+- `procurement.yml` - Equipment/software purchases
+- `long-term-task.yml` - Multi-week projects for officer
+
+**Note:** Templates were intentionally simplified from 10-15 fields down to 3-4 fields to encourage completion. Users can provide additional context in the optional "Additional Details" field.
 
 ### Automated Label Management
 
@@ -190,10 +220,12 @@ gh run list --workflow=label-audit-fix.yml
 ```
 
 **What it fixes:**
-- Removes `overdue`/`at-risk` from long-term projects
+- Removes `overdue`/`at-risk` from long-term projects (title-based or label-based detection)
 - Removes `overdue`/`at-risk` from issues with override labels
 - Removes duplicate status labels (keeps most advanced status)
 - Removes `overdue`/`at-risk` from resolved/closed issues
+
+**Note:** Results are shown in the Actions workflow logs only. No summary issues are created.
 
 **When to run:**
 - After adding new workflows to clean up existing issues
