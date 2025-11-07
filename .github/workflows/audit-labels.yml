@@ -1,0 +1,233 @@
+name: Label Audit and Fix
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (preview changes without applying them)'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  audit-and-fix-labels:
+    runs-on: ubuntu-latest
+    name: Audit and fix incorrectly applied labels
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fix incorrect labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dryRun = ${{ inputs.dry_run }};
+
+            if (dryRun) {
+              console.log('🔍 DRY RUN MODE - No changes will be made');
+              console.log('='.repeat(60));
+            } else {
+              console.log('⚠️  LIVE MODE - Changes will be applied');
+              console.log('='.repeat(60));
+            }
+
+            let stats = {
+              issuesScanned: 0,
+              overdueRemoved: 0,
+              atRiskRemoved: 0,
+              duplicateStatusRemoved: 0,
+              issuesFixed: 0
+            };
+
+            // Get all open issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            console.log(`\nFound ${issues.data.length} open issues to audit\n`);
+
+            // Define override labels
+            const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay', 'sub-issue'];
+
+            for (const issue of issues.data) {
+              // Skip pull requests
+              if (issue.pull_request) continue;
+
+              stats.issuesScanned++;
+              const labels = issue.labels.map(l => l.name);
+              let issueNeedsFixing = false;
+              let labelsToRemove = [];
+              let issueLog = [];
+
+              // Check 1: Remove overdue/at-risk from long-term projects
+              if (labels.includes('category: long-term')) {
+                if (labels.includes('overdue')) {
+                  issueLog.push('  ❌ Has "overdue" but is long-term project');
+                  labelsToRemove.push('overdue');
+                  stats.overdueRemoved++;
+                  issueNeedsFixing = true;
+                }
+                if (labels.includes('at-risk')) {
+                  issueLog.push('  ❌ Has "at-risk" but is long-term project');
+                  labelsToRemove.push('at-risk');
+                  stats.atRiskRemoved++;
+                  issueNeedsFixing = true;
+                }
+              }
+
+              // Check 2: Remove overdue/at-risk from issues with override labels
+              const hasOverride = overrideLabels.some(label => labels.includes(label));
+              if (hasOverride) {
+                const overrideLabel = overrideLabels.find(label => labels.includes(label));
+                if (labels.includes('overdue')) {
+                  issueLog.push(`  ❌ Has "overdue" but has override label "${overrideLabel}"`);
+                  labelsToRemove.push('overdue');
+                  stats.overdueRemoved++;
+                  issueNeedsFixing = true;
+                }
+                if (labels.includes('at-risk')) {
+                  issueLog.push(`  ❌ Has "at-risk" but has override label "${overrideLabel}"`);
+                  labelsToRemove.push('at-risk');
+                  stats.atRiskRemoved++;
+                  issueNeedsFixing = true;
+                }
+              }
+
+              // Check 3: Remove duplicate status labels (keep the most recent status)
+              const statusLabels = labels.filter(l => l.startsWith('status:'));
+              if (statusLabels.length > 1) {
+                // Define status progression order (most advanced first)
+                const statusOrder = [
+                  'status: closed',
+                  'status: resolved',
+                  'status: waiting-for-user',
+                  'status: in-progress',
+                  'status: acknowledged',
+                  'status: new'
+                ];
+
+                // Find the most advanced status
+                let keepStatus = null;
+                for (const status of statusOrder) {
+                  if (statusLabels.includes(status)) {
+                    keepStatus = status;
+                    break;
+                  }
+                }
+
+                // Remove all other status labels
+                for (const status of statusLabels) {
+                  if (status !== keepStatus) {
+                    issueLog.push(`  ❌ Duplicate status "${status}" (keeping "${keepStatus}")`);
+                    labelsToRemove.push(status);
+                    stats.duplicateStatusRemoved++;
+                    issueNeedsFixing = true;
+                  }
+                }
+              }
+
+              // Check 4: Remove overdue/at-risk from resolved or closed status
+              if (labels.includes('status: resolved') || labels.includes('status: closed')) {
+                if (labels.includes('overdue') && !labelsToRemove.includes('overdue')) {
+                  issueLog.push('  ❌ Has "overdue" but status is resolved/closed');
+                  labelsToRemove.push('overdue');
+                  stats.overdueRemoved++;
+                  issueNeedsFixing = true;
+                }
+                if (labels.includes('at-risk') && !labelsToRemove.includes('at-risk')) {
+                  issueLog.push('  ❌ Has "at-risk" but status is resolved/closed');
+                  labelsToRemove.push('at-risk');
+                  stats.atRiskRemoved++;
+                  issueNeedsFixing = true;
+                }
+              }
+
+              // Apply fixes if needed
+              if (issueNeedsFixing) {
+                stats.issuesFixed++;
+                console.log(`\n📋 Issue #${issue.number}: ${issue.title}`);
+                issueLog.forEach(log => console.log(log));
+
+                if (!dryRun) {
+                  // Remove each label
+                  for (const labelName of labelsToRemove) {
+                    try {
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issue.number,
+                        name: labelName
+                      });
+                      console.log(`  ✅ Removed "${labelName}"`);
+                    } catch (error) {
+                      console.log(`  ⚠️  Failed to remove "${labelName}": ${error.message}`);
+                    }
+                  }
+                } else {
+                  console.log(`  🔍 Would remove: ${labelsToRemove.join(', ')}`);
+                }
+              }
+            }
+
+            // Print summary
+            console.log('\n' + '='.repeat(60));
+            console.log('📊 AUDIT SUMMARY');
+            console.log('='.repeat(60));
+            console.log(`Issues scanned: ${stats.issuesScanned}`);
+            console.log(`Issues needing fixes: ${stats.issuesFixed}`);
+            console.log(`  - "overdue" labels removed: ${stats.overdueRemoved}`);
+            console.log(`  - "at-risk" labels removed: ${stats.atRiskRemoved}`);
+            console.log(`  - Duplicate status labels removed: ${stats.duplicateStatusRemoved}`);
+
+            if (dryRun) {
+              console.log('\n💡 This was a DRY RUN - no changes were made');
+              console.log('To apply these changes, run the workflow again with "Dry run" unchecked');
+            } else {
+              console.log('\n✅ All fixes have been applied!');
+            }
+
+            // Create a summary issue if running in live mode and fixes were made
+            if (!dryRun && stats.issuesFixed > 0) {
+              const now = new Date().toISOString();
+              const dateStr = now.split('T')[0];
+
+              const summaryBody = `# Label Audit Results
+
+**Audit completed:** ${now}
+
+## Summary
+
+- **Issues scanned:** ${stats.issuesScanned}
+- **Issues fixed:** ${stats.issuesFixed}
+- **"overdue" labels removed:** ${stats.overdueRemoved}
+- **"at-risk" labels removed:** ${stats.atRiskRemoved}
+- **Duplicate status labels removed:** ${stats.duplicateStatusRemoved}
+
+## What was fixed
+
+The following issues were corrected:
+1. Removed \`overdue\` and \`at-risk\` labels from long-term projects
+2. Removed \`overdue\` and \`at-risk\` labels from issues with override labels
+3. Removed duplicate status labels (kept most advanced status)
+4. Removed \`overdue\` and \`at-risk\` labels from resolved/closed issues
+
+*This audit was run manually using the Label Audit & Fix workflow.*`;
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Label Audit Results - ${dateStr}`,
+                body: summaryBody,
+                labels: ['report']
+              });
+
+              console.log('\n📄 Summary issue created');
+            }
