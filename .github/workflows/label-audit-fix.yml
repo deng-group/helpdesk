@@ -195,35 +195,3 @@ jobs:
             } else {
               console.log('\n✅ All fixes have been applied!');
             }
-
-            // Create a summary issue if running in live mode and fixes were made
-            if (!dryRun && stats.issuesFixed > 0) {
-              const now = new Date().toISOString();
-              const dateStr = now.split('T')[0];
-
-              let summaryBody = '# Label Audit Results\n\n';
-              summaryBody += '**Audit completed:** ' + now + '\n\n';
-              summaryBody += '## Summary\n\n';
-              summaryBody += '- **Issues scanned:** ' + stats.issuesScanned + '\n';
-              summaryBody += '- **Issues fixed:** ' + stats.issuesFixed + '\n';
-              summaryBody += '- **"overdue" labels removed:** ' + stats.overdueRemoved + '\n';
-              summaryBody += '- **"at-risk" labels removed:** ' + stats.atRiskRemoved + '\n';
-              summaryBody += '- **Duplicate status labels removed:** ' + stats.duplicateStatusRemoved + '\n\n';
-              summaryBody += '## What was fixed\n\n';
-              summaryBody += 'The following issues were corrected:\n';
-              summaryBody += '1. Removed `overdue` and `at-risk` labels from long-term projects\n';
-              summaryBody += '2. Removed `overdue` and `at-risk` labels from issues with override labels\n';
-              summaryBody += '3. Removed duplicate status labels (kept most advanced status)\n';
-              summaryBody += '4. Removed `overdue` and `at-risk` labels from resolved/closed issues\n\n';
-              summaryBody += '*This audit was run manually using the Label Audit & Fix workflow.*';
-
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: 'Label Audit Results - ' + dateStr,
-                body: summaryBody,
-                labels: ['report']
-              });
-
-              console.log('\n📄 Summary issue created');
-            }
