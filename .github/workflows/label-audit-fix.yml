@@ -196,9 +196,12 @@ jobs:
 
             // Create a summary issue if running in live mode and fixes were made
             if (!dryRun && stats.issuesFixed > 0) {
+              const now = new Date().toISOString();
+              const dateStr = now.split('T')[0];
+
               const summaryBody = `# Label Audit Results
 
-**Audit completed:** ${new Date().toISOString()}
+**Audit completed:** ${now}
 
 ## Summary
 
@@ -211,17 +214,17 @@ jobs:
 ## What was fixed
 
 The following issues were corrected:
-1. Removed \`overdue\` and \`at-risk\` labels from long-term projects
-2. Removed \`overdue\` and \`at-risk\` labels from issues with override labels
+1. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from long-term projects
+2. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from issues with override labels
 3. Removed duplicate status labels (kept most advanced status)
-4. Removed \`overdue\` and \`at-risk\` labels from resolved/closed issues
+4. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from resolved/closed issues
 
 *This audit was run manually using the Label Audit & Fix workflow.*`;
 
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: `Label Audit Results - ${new Date().toISOString().split('T')[0]}`,
+                title: `Label Audit Results - ${dateStr}`,
                 body: summaryBody,
                 labels: ['report']
               });
