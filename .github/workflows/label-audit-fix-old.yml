@@ -1,7 +1,7 @@
-name: Label Audit and Fix
+name: Label Audit & Fix
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger only
     inputs:
       dry_run:
         description: 'Dry run (preview changes without applying them)'
@@ -214,10 +214,10 @@ jobs:
 ## What was fixed
 
 The following issues were corrected:
-1. Removed \`overdue\` and \`at-risk\` labels from long-term projects
-2. Removed \`overdue\` and \`at-risk\` labels from issues with override labels
+1. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from long-term projects
+2. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from issues with override labels
 3. Removed duplicate status labels (kept most advanced status)
-4. Removed \`overdue\` and \`at-risk\` labels from resolved/closed issues
+4. Removed \\\`overdue\\\` and \\\`at-risk\\\` labels from resolved/closed issues
 
 *This audit was run manually using the Label Audit & Fix workflow.*`;
 
