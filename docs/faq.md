@@ -68,8 +68,12 @@ Still broken? → [Create ticket](../../issues/new/choose)
 ## 📋 Using This Help Desk
 
 **Q: How fast will I get a response?**
-- Urgent/High: Same day | Medium: Within 1 day | Low: Within 2 days
-- We aim to acknowledge all tickets promptly
+- Urgent: 4h response, 8h resolution (same day)
+- High: 4h response, 3 day resolution
+- Medium: 24h response, 5 day resolution
+- Low: 48h response, 7 day resolution
+- Procurement: 48h response, 6 week resolution
+- We aim to acknowledge sooner whenever possible
 - (Business hours: Mon-Fri, 9 AM - 5 PM SGT)
 
 **Q: Don't have GitHub account?**

@@ -23,6 +23,8 @@ echo "Officer Username: @$OFFICER_USERNAME"
 echo "Officer First Name: $OFFICER_FIRST_NAME"
 echo ""
 
+export OFFICER_NAME OFFICER_EMAIL OFFICER_USERNAME OFFICER_FIRST_NAME
+
 # Function to update a file
 update_file() {
     local file=$1
@@ -31,25 +33,36 @@ update_file() {
     # Create backup
     cp "$file" "$file.bak"
 
-    # Replace full name
-    sed -i '' "s/Tim Pook/$OFFICER_NAME/g" "$file"
+    TARGET_FILE="$file" python3 <<'PY'
+import os
+import pathlib
+import re
 
-    # Replace email
-    sed -i '' "s/tim\.pook@nus\.edu\.sg/$OFFICER_EMAIL/g" "$file"
+file_path = pathlib.Path(os.environ["TARGET_FILE"])
+text = file_path.read_text()
+original = text
 
-    # Replace first name only in CONTRIBUTING.md
-    if [[ "$file" == "CONTRIBUTING.md" ]]; then
-        sed -i '' "s/\bTim\b/$OFFICER_FIRST_NAME/g" "$file"
-    fi
+officer_name = os.environ["OFFICER_NAME"]
+officer_email = os.environ["OFFICER_EMAIL"]
+officer_first = os.environ["OFFICER_FIRST_NAME"]
+
+text = text.replace("Tim Pook", officer_name)
+text = text.replace("tim.pook@nus.edu.sg", officer_email)
+
+if file_path.name == "CONTRIBUTING.md":
+    text = re.sub(r"\bTim\b", officer_first, text)
+
+if text != original:
+    file_path.write_text(text)
+PY
 
     # Check if file changed
     if diff -q "$file" "$file.bak" > /dev/null; then
         echo "  No changes needed"
-        rm "$file.bak"
     else
         echo -e "  ${GREEN}✓ Updated${NC}"
-        rm "$file.bak"
     fi
+    rm "$file.bak"
 }
 
 # Update files

@@ -20,8 +20,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const now = new Date();
             const oneWeekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
 
             // Format dates
             const formatDate = (date) => date.toISOString().split('T')[0];
@@ -30,31 +33,50 @@ jobs:
 
             console.log(`Generating report for ${weekStart} to ${weekEnd}`);
 
+            // Determine officer username for response-time tracking
+            let officerUsername = 'Tim-Pook';
+            try {
+              const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
+              const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
+              if (usernameMatch) {
+                officerUsername = usernameMatch[1];
+                console.log(`Tracking responses from @${officerUsername}`);
+              }
+            } catch (error) {
+              console.log('Officer config not found, using default username');
+            }
+
             // Get all issues (open and closed)
-            const allIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'all',
-              per_page: 100,
-              since: oneWeekAgo.toISOString()
-            });
+            const allIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'all',
+                per_page: 100,
+                since: oneWeekAgo.toISOString()
+              }
+            );
 
             // Filter out pull requests
-            const issues = allIssues.data.filter(i => !i.pull_request);
+            const issues = allIssues.filter(i => !i.pull_request);
 
             // Calculate metrics
             const createdThisWeek = issues.filter(i => new Date(i.created_at) >= oneWeekAgo);
             const closedThisWeek = issues.filter(i => i.state === 'closed' && new Date(i.closed_at) >= oneWeekAgo);
 
             // Get all currently open issues
-            const openIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100
-            });
+            const openIssues = await github.paginate(
+              github.rest.issues.listForRepo,
+              {
+                owner,
+                repo,
+                state: 'open',
+                per_page: 100
+              }
+            );
 
-            const currentlyOpen = openIssues.data.filter(i => !i.pull_request);
+            const currentlyOpen = openIssues.filter(i => !i.pull_request);
 
             // Count by priority
             const countByLabel = (issues, labelPrefix) => {
@@ -79,15 +101,31 @@ jobs:
             let ticketsWithResponse = 0;
 
             for (const issue of closedThisWeek) {
-              // Get first comment by officer or anyone other than issue creator
-              const comments = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                per_page: 100
-              });
+              // Get first comment by officer (or an assignee acting on their behalf)
+              const responderCandidates = new Set();
+              if (officerUsername) {
+                responderCandidates.add(officerUsername);
+              }
+              if (Array.isArray(issue.assignees)) {
+                issue.assignees.forEach(assignee => {
+                  if (assignee && assignee.login) {
+                    responderCandidates.add(assignee.login);
+                  }
+                });
+              }
+              if (responderCandidates.size === 0) continue;
 
-              const firstResponse = comments.data.find(c => c.user.login !== issue.user.login);
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                {
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  per_page: 100
+                }
+              );
+
+              const firstResponse = comments.find(c => c.user && responderCandidates.has(c.user.login));
               if (firstResponse) {
                 const responseTime = new Date(firstResponse.created_at) - new Date(issue.created_at);
                 totalResponseTime += responseTime;

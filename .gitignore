@@ -34,3 +34,7 @@ setup-labels.sh
 # Environment files
 .env
 .env.local
+
+GEMINI.md
+AGENT.md
+CLAUDE.md
