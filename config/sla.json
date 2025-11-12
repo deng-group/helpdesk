@@ -28,5 +28,6 @@
     "label": "category: long-term",
     "title_prefix": "[Long-term]"
   },
-  "at_risk_lead_hours": 24
+  "at_risk_lead_hours": 24,
+  "response_at_risk_lead_hours": 24
 }

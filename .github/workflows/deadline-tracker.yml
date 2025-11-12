@@ -24,9 +24,9 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const now = new Date();
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            const now = new Date();
             const HOUR_IN_MS = 1000 * 60 * 60;
 
             const fallbackSla = {
@@ -47,7 +47,8 @@ jobs:
                 label: 'category: long-term',
                 title_prefix: '[Long-term]'
               },
-              at_risk_lead_hours: 24
+              at_risk_lead_hours: 24,
+              response_at_risk_lead_hours: 24
             };
 
             const loadSlaConfig = () => {
@@ -64,10 +65,13 @@ jobs:
             const priorityConfig = { ...fallbackSla.priorities, ...(rawSlaConfig.priorities || {}) };
             const defaultPriority = rawSlaConfig.default_priority || fallbackSla.default_priority;
             const procurementConfig = { ...fallbackSla.procurement, ...(rawSlaConfig.procurement || {}) };
+            const longTermConfig = { ...fallbackSla.long_term, ...(rawSlaConfig.long_term || {}) };
             const atRiskLeadDefault = typeof rawSlaConfig.at_risk_lead_hours === 'number'
               ? rawSlaConfig.at_risk_lead_hours
               : fallbackSla.at_risk_lead_hours;
-            const longTermConfig = { ...fallbackSla.long_term, ...(rawSlaConfig.long_term || {}) };
+            const responseAtRiskLeadHours = typeof rawSlaConfig.response_at_risk_lead_hours === 'number'
+              ? rawSlaConfig.response_at_risk_lead_hours
+              : fallbackSla.response_at_risk_lead_hours;
 
             const determinePriority = (labels) => {
               for (const labelName of Object.keys(priorityConfig)) {
@@ -84,26 +88,29 @@ jobs:
 
             const getDeadlines = (labels) => {
               const isProcurement = procurementConfig.label && labels.includes(procurementConfig.label);
+              const priorityLabel = determinePriority(labels);
+              const priorityEntry = getPriorityEntry(priorityLabel);
+
+              if (!priorityEntry) {
+                return null;
+              }
+
               if (isProcurement) {
                 return {
                   responseHours: procurementConfig.response_hours,
                   resolutionHours: procurementConfig.resolution_hours,
                   atRiskLeadHours: procurementConfig.at_risk_lead_hours ?? atRiskLeadDefault,
-                  priority: determinePriority(labels)
+                  isProcurement,
+                  priorityLabel
                 };
-              }
-
-              const priorityLabel = determinePriority(labels);
-              const priorityEntry = getPriorityEntry(priorityLabel);
-              if (!priorityEntry) {
-                return null;
               }
 
               return {
                 responseHours: priorityEntry.response_hours,
                 resolutionHours: priorityEntry.resolution_hours,
                 atRiskLeadHours: atRiskLeadDefault,
-                priority: priorityLabel
+                isProcurement: false,
+                priorityLabel
               };
             };
 
@@ -116,9 +123,7 @@ jobs:
                   name: labelName
                 }).catch(() => {});
                 const idx = labels.indexOf(labelName);
-                if (idx !== -1) {
-                  labels.splice(idx, 1);
-                }
+                if (idx !== -1) labels.splice(idx, 1);
               }
             };
 
@@ -140,8 +145,8 @@ jobs:
             };
 
             // Read officer config
-            let officerUsername = 'Tim-Pook'; // fallback
-            let officerName = 'Tim Pook'; // fallback
+            let officerUsername = 'Tim-Pook';
+            let officerName = 'Tim Pook';
             try {
               const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
               const usernameMatch = officerConfig.match(/github_username:\s*["']([^"']+)["']/);
@@ -157,12 +162,11 @@ jobs:
               console.log('Officer config not found, using default');
             }
 
-            // Check if officer is on leave - simple text parsing
+            // Check leave config
             let onLeave = false;
-            let leaveInfo = {
+            const leaveInfo = {
               leave_start: '',
               leave_end: '',
-              on_leave: false,
               leave_reason: '',
               urgent_instructions: ''
             };
@@ -170,9 +174,7 @@ jobs:
             try {
               const yamlContent = fs.readFileSync('.github/on-leave.yml', 'utf8');
               onLeave = yamlContent.includes('on_leave: true');
-              leaveInfo.on_leave = onLeave;
 
-              // Extract dates and messaging
               const leaveStartMatch = yamlContent.match(/leave_start:\s*["']([^"']+)["']/);
               if (leaveStartMatch) leaveInfo.leave_start = leaveStartMatch[1];
 
@@ -182,20 +184,16 @@ jobs:
               const leaveReasonMatch = yamlContent.match(/leave_reason:\s*["']([^"']+)["']/);
               if (leaveReasonMatch) leaveInfo.leave_reason = leaveReasonMatch[1];
 
-              const urgentInstructionsMatch = yamlContent.match(/urgent_instructions:\s*["']([^"']+)["']/);
-              if (urgentInstructionsMatch) leaveInfo.urgent_instructions = urgentInstructionsMatch[1];
+              const urgentMatch = yamlContent.match(/urgent_instructions:\s*["']([^"']+)["']/);
+              if (urgentMatch) leaveInfo.urgent_instructions = urgentMatch[1];
 
               console.log(`Leave status: ${onLeave ? 'ON LEAVE' : 'Available'}`);
-              if (onLeave) {
-                console.log(`Leave period: ${leaveInfo.leave_start} to ${leaveInfo.leave_end}`);
-              }
             } catch (error) {
-              console.log('Leave config not found or error reading it, assuming officer is available');
+              console.log('Leave config not found or invalid, assuming officer is available');
             }
 
-            // If on leave, skip SLA tracking but add leave notice to new tickets
             if (onLeave) {
-              console.log('Officer is on leave - skipping SLA enforcement');
+              console.log('Officer on leave - posting leave notices and skipping SLA enforcement');
 
               const newIssues = await github.paginate(
                 github.rest.issues.listForRepo,
@@ -221,38 +219,35 @@ jobs:
                   }
                 );
 
-                const hasLeaveNotice = comments.some(c => c.body && c.body.includes('currently on leave'));
+                const hasNotice = comments.some((comment) => comment.body && comment.body.includes('currently on leave'));
+                if (hasNotice) continue;
 
-                if (!hasLeaveNotice) {
-                  const returnDate = leaveInfo.leave_end || 'TBD';
-                  const urgentInstructions = leaveInfo.urgent_instructions || ('Please wait until ' + officerName.split(' ')[0] + ' returns.');
+                const returnDate = leaveInfo.leave_end || 'TBD';
+                const urgentInstructions = leaveInfo.urgent_instructions || `Please wait until ${officerName.split(' ')[0]} returns.`;
 
-                  let leaveNotice = '📅 **Leave Notice**\n\n';
-                  leaveNotice += officerName + ' is currently on leave and will return on **' + returnDate + '**.\n\n';
-                  if (leaveInfo.leave_reason) {
-                    leaveNotice += 'Reason: ' + leaveInfo.leave_reason + '\n\n';
-                  }
-                  leaveNotice += '- **For urgent issues:** ' + urgentInstructions + '\n';
-                  leaveNotice += '- **For non-urgent issues:** Your ticket will be addressed when ' + officerName.split(' ')[0] + ' returns.\n\n';
-                  leaveNotice += 'Thank you for your patience! 🙏';
-
-                  await github.rest.issues.createComment({
-                    owner,
-                    repo,
-                    issue_number: issue.number,
-                    body: leaveNotice
-                  });
-
-                  console.log(`Added leave notice to issue #${issue.number}`);
+                let leaveNotice = '📅 **Leave Notice**\n\n';
+                leaveNotice += `${officerName} is currently on leave and will return on **${returnDate}**.\n\n`;
+                if (leaveInfo.leave_reason) {
+                  leaveNotice += `Reason: ${leaveInfo.leave_reason}\n\n`;
                 }
+                leaveNotice += `- **For urgent issues:** ${urgentInstructions}\n`;
+                leaveNotice += `- **For non-urgent issues:** Your ticket will be addressed when ${officerName.split(' ')[0]} returns.\n\n`;
+                leaveNotice += 'Thank you for your patience! 🙏';
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  body: leaveNotice
+                });
+
+                console.log(`Added leave notice to issue #${issue.number}`);
               }
 
-              console.log('Leave handling complete. Exiting without SLA checks.');
-              return; // Exit early - don't do SLA tracking during leave
+              return;
             }
 
-            // Normal SLA tracking (officer is available)
-            console.log('Officer is available - performing normal SLA checks');
+            console.log('Officer available - enforcing SLA normally');
 
             const issues = await github.paginate(
               github.rest.issues.listForRepo,
@@ -269,7 +264,7 @@ jobs:
             for (const issue of issues) {
               if (issue.pull_request) continue;
 
-              const labels = issue.labels.map(l => l.name);
+              const labels = issue.labels.map((label) => label.name);
               const isLongTerm = (longTermConfig.label && labels.includes(longTermConfig.label)) ||
                 (longTermConfig.title_prefix && issue.title && issue.title.startsWith(longTermConfig.title_prefix));
 
@@ -280,7 +275,7 @@ jobs:
               }
 
               const overrideLabels = ['sla-exception', 'complex-issue', 'waiting-external', 'acknowledged-delay', 'sub-issue'];
-              const hasOverride = overrideLabels.some(label => labels.includes(label));
+              const hasOverride = overrideLabels.some((label) => labels.includes(label));
 
               if (hasOverride) {
                 console.log(`Issue #${issue.number} has override label - skipping SLA checks`);
@@ -297,12 +292,13 @@ jobs:
               const createdAt = new Date(issue.created_at);
               const ageHours = (now - createdAt) / HOUR_IN_MS;
 
+              let shouldBeAtRisk = false;
+
               if (labels.includes('status: new')) {
                 const hoursUntilResponseDeadline = deadlines.responseHours - ageHours;
 
                 if (hoursUntilResponseDeadline < 0) {
                   console.log(`Issue #${issue.number} is overdue for response (${Math.abs(hoursUntilResponseDeadline).toFixed(1)}h past deadline)`);
-
                   const alreadyOverdue = labels.includes('overdue');
                   await addLabelIfMissing(issue, labels, 'overdue');
 
@@ -314,17 +310,18 @@ jobs:
                       body: `⚠️ **Response Overdue**\n\nThis ticket has not been acknowledged within the expected ${deadlines.responseHours} hour timeframe.\n\n@${officerUsername} - Please review and acknowledge this ticket.\n\n*Business hours: Mon-Fri, 9 AM - 5 PM SGT*`
                     });
                   }
+                } else if (hoursUntilResponseDeadline > 0 && hoursUntilResponseDeadline <= responseAtRiskLeadHours && !labels.includes('overdue')) {
+                  shouldBeAtRisk = true;
+                  await addLabelIfMissing(issue, labels, 'at-risk');
+                  console.log(`Issue #${issue.number} is at-risk for response (${hoursUntilResponseDeadline.toFixed(1)}h remaining)`);
                 }
               }
-
-              let shouldHaveAtRiskLabel = false;
 
               if (labels.includes('status: in-progress') || labels.includes('status: acknowledged')) {
                 const hoursUntilResolutionDeadline = deadlines.resolutionHours - ageHours;
 
                 if (hoursUntilResolutionDeadline < 0) {
                   console.log(`Issue #${issue.number} is overdue for resolution (${Math.abs(hoursUntilResolutionDeadline).toFixed(1)}h past deadline)`);
-
                   const alreadyOverdue = labels.includes('overdue');
                   await addLabelIfMissing(issue, labels, 'overdue');
 
@@ -337,16 +334,15 @@ jobs:
                       body: `⏰ **Resolution Overdue**\n\nThis ticket has exceeded the expected resolution timeframe by ${daysPast} days.\n\n@${officerUsername} - Please provide an update on progress.\n\n*Expected resolution: ${deadlines.resolutionHours} hours (~${(deadlines.resolutionHours / 24).toFixed(1)} days)*`
                     });
                   }
-                } else if (hoursUntilResolutionDeadline > 0 && hoursUntilResolutionDeadline <= deadlines.atRiskLeadHours) {
-                  shouldHaveAtRiskLabel = true;
-                  if (!labels.includes('overdue')) {
-                    await addLabelIfMissing(issue, labels, 'at-risk');
-                    console.log(`Issue #${issue.number} is at-risk for resolution (${hoursUntilResolutionDeadline.toFixed(1)}h until deadline)`);
-                  }
+                } else if (hoursUntilResolutionDeadline > 0 && hoursUntilResolutionDeadline <= deadlines.atRiskLeadHours && !labels.includes('overdue')) {
+                  shouldBeAtRisk = true;
+                  await addLabelIfMissing(issue, labels, 'at-risk');
+                  const daysUntil = (hoursUntilResolutionDeadline / 24).toFixed(1);
+                  console.log(`Issue #${issue.number} is at-risk for resolution (${daysUntil} days remaining)`);
                 }
               }
 
-              if (labels.includes('at-risk') && (!shouldHaveAtRiskLabel || labels.includes('status: resolved') || labels.includes('status: closed'))) {
+              if ((!shouldBeAtRisk || labels.includes('overdue') || labels.includes('status: resolved') || labels.includes('status: closed')) && labels.includes('at-risk')) {
                 await removeLabelIfPresent(issue, labels, 'at-risk');
               }
             }

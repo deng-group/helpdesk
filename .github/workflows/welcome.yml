@@ -23,7 +23,38 @@ jobs:
           script: |
             const fs = require('fs');
             const issue = context.payload.issue;
-            const labels = issue.labels.map(l => l.name);
+            let labels = issue.labels.map(l => l.name);
+
+            // Parse issue body to extract and add priority label if not already set
+            const issueBody = issue.body || '';
+            const hasPriorityLabel = labels.some(l => l.startsWith('priority:'));
+
+            if (!hasPriorityLabel) {
+              let priorityLabel = null;
+
+              // Check for priority in issue body
+              if (issueBody.includes('Low (can wait a week)')) {
+                priorityLabel = 'priority: low';
+              } else if (issueBody.includes('Medium (needed within a few days)')) {
+                priorityLabel = 'priority: medium';
+              } else if (issueBody.includes('High (blocking my work)')) {
+                priorityLabel = 'priority: high';
+              } else if (issueBody.includes('Urgent (critical issue)')) {
+                priorityLabel = 'priority: urgent';
+              }
+
+              // Add the priority label if found
+              if (priorityLabel) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [priorityLabel]
+                });
+                labels.push(priorityLabel);
+                console.log(`Added label: ${priorityLabel}`);
+              }
+            }
 
             const fallbackSla = {
               priorities: {

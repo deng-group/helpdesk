@@ -13,8 +13,8 @@ leave_end: ""
 leave_reason: ""
 
 # Backup contact information (if available)
-backup_contact_name: ""
-backup_contact_email: ""
+backup_contact_name: "Jerry"
+backup_contact_email: "msedz@nus.edu.sg"
 
 # Instructions for urgent issues during leave
 urgent_instructions: "For urgent issues, please contact Prof. Zeyu Deng or wait until Tim returns."

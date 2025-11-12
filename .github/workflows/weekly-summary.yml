@@ -26,14 +26,12 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            // Format dates
             const formatDate = (date) => date.toISOString().split('T')[0];
             const weekStart = formatDate(oneWeekAgo);
             const weekEnd = formatDate(now);
 
             console.log(`Generating report for ${weekStart} to ${weekEnd}`);
 
-            // Determine officer username for response-time tracking
             let officerUsername = 'Tim-Pook';
             try {
               const officerConfig = fs.readFileSync('.github/officer-config.yml', 'utf8');
@@ -46,7 +44,6 @@ jobs:
               console.log('Officer config not found, using default username');
             }
 
-            // Get all issues (open and closed)
             const allIssues = await github.paginate(
               github.rest.issues.listForRepo,
               {
@@ -58,14 +55,10 @@ jobs:
               }
             );
 
-            // Filter out pull requests
-            const issues = allIssues.filter(i => !i.pull_request);
+            const issues = allIssues.filter((issue) => !issue.pull_request);
+            const createdThisWeek = issues.filter((issue) => new Date(issue.created_at) >= oneWeekAgo);
+            const closedThisWeek = issues.filter((issue) => issue.state === 'closed' && new Date(issue.closed_at) >= oneWeekAgo);
 
-            // Calculate metrics
-            const createdThisWeek = issues.filter(i => new Date(i.created_at) >= oneWeekAgo);
-            const closedThisWeek = issues.filter(i => i.state === 'closed' && new Date(i.closed_at) >= oneWeekAgo);
-
-            // Get all currently open issues
             const openIssues = await github.paginate(
               github.rest.issues.listForRepo,
               {
@@ -76,13 +69,12 @@ jobs:
               }
             );
 
-            const currentlyOpen = openIssues.filter(i => !i.pull_request);
+            const currentlyOpen = openIssues.filter((issue) => !issue.pull_request);
 
-            // Count by priority
-            const countByLabel = (issues, labelPrefix) => {
+            const countByLabel = (collection, prefix) => {
               const counts = {};
-              issues.forEach(issue => {
-                const label = issue.labels.find(l => l.name.startsWith(labelPrefix));
+              collection.forEach((issue) => {
+                const label = issue.labels.find((l) => l.name.startsWith(prefix));
                 if (label) {
                   counts[label.name] = (counts[label.name] || 0) + 1;
                 }
@@ -92,27 +84,22 @@ jobs:
 
             const openByPriority = countByLabel(currentlyOpen, 'priority:');
             const openByCategory = countByLabel(currentlyOpen, 'category:');
+            const overdueTickets = currentlyOpen.filter((issue) => issue.labels.some((l) => l.name === 'overdue'));
 
-            // Count overdue tickets
-            const overdueTickets = currentlyOpen.filter(i => i.labels.some(l => l.name === 'overdue'));
-
-            // Calculate response times for closed tickets
             let totalResponseTime = 0;
             let ticketsWithResponse = 0;
 
             for (const issue of closedThisWeek) {
-              // Get first comment by officer (or an assignee acting on their behalf)
               const responderCandidates = new Set();
-              if (officerUsername) {
-                responderCandidates.add(officerUsername);
-              }
+              if (officerUsername) responderCandidates.add(officerUsername);
               if (Array.isArray(issue.assignees)) {
-                issue.assignees.forEach(assignee => {
+                issue.assignees.forEach((assignee) => {
                   if (assignee && assignee.login) {
                     responderCandidates.add(assignee.login);
                   }
                 });
               }
+
               if (responderCandidates.size === 0) continue;
 
               const comments = await github.paginate(
@@ -125,7 +112,7 @@ jobs:
                 }
               );
 
-              const firstResponse = comments.find(c => c.user && responderCandidates.has(c.user.login));
+              const firstResponse = comments.find((comment) => comment.user && responderCandidates.has(comment.user.login));
               if (firstResponse) {
                 const responseTime = new Date(firstResponse.created_at) - new Date(issue.created_at);
                 totalResponseTime += responseTime;
@@ -137,69 +124,83 @@ jobs:
               ? (totalResponseTime / ticketsWithResponse / (1000 * 60 * 60)).toFixed(1)
               : 'N/A';
 
-            // Calculate oldest ticket age
             let oldestTicketAge = 0;
             let oldestTicketNumber = null;
-            currentlyOpen.forEach(issue => {
-              const age = (now - new Date(issue.created_at)) / (1000 * 60 * 60 * 24);
-              if (age > oldestTicketAge) {
-                oldestTicketAge = age;
+            currentlyOpen.forEach((issue) => {
+              const ageDays = (now - new Date(issue.created_at)) / (1000 * 60 * 60 * 24);
+              if (ageDays > oldestTicketAge) {
+                oldestTicketAge = ageDays;
                 oldestTicketNumber = issue.number;
               }
             });
 
-            // Generate report using string concatenation to avoid YAML parsing issues
             let report = '';
             report += '# 📊 Weekly Help Desk Report\n\n';
-            report += '**Period:** ' + weekStart + ' to ' + weekEnd + '\n\n';
+            report += `**Period:** ${weekStart} to ${weekEnd}\n\n`;
             report += '---\n\n## 📈 Overview\n\n';
             report += '| Metric | Count |\n|--------|-------|\n';
-            report += '| 🆕 New Tickets | ' + createdThisWeek.length + ' |\n';
-            report += '| ✅ Closed Tickets | ' + closedThisWeek.length + ' |\n';
-            report += '| 📂 Currently Open | ' + currentlyOpen.length + ' |\n';
-            report += '| ⚠️ Overdue | ' + overdueTickets.length + ' |\n\n';
-            report += '**Net Change:** ' + (createdThisWeek.length - closedThisWeek.length > 0 ? '+' : '') + (createdThisWeek.length - closedThisWeek.length) + '\n\n';
+            report += `| 🆕 New Tickets | ${createdThisWeek.length} |\n`;
+            report += `| ✅ Closed Tickets | ${closedThisWeek.length} |\n`;
+            report += `| 📂 Currently Open | ${currentlyOpen.length} |\n`;
+            report += `| ⚠️ Overdue | ${overdueTickets.length} |\n\n`;
+            const netChange = createdThisWeek.length - closedThisWeek.length;
+            report += `**Net Change:** ${netChange >= 0 ? '+' : ''}${netChange}\n\n`;
             report += '---\n\n## ⏱️ Response Time\n\n';
-            report += '- **Average Response Time:** ' + avgResponseHours + ' hours\n';
+            report += `- **Average Response Time:** ${avgResponseHours} hours\n`;
             report += '- **Target:** <24 hours for medium priority\n\n';
-            report += (ticketsWithResponse > 0 ? '*Based on ' + ticketsWithResponse + ' resolved tickets this week*' : '*No tickets resolved this week*') + '\n\n';
+            report += (ticketsWithResponse > 0 ? `*Based on ${ticketsWithResponse} resolved tickets this week*` : '*No tickets resolved this week*') + '\n\n';
             report += '---\n\n## 📊 Open Tickets Breakdown\n\n### By Priority\n';
-            report += (Object.keys(openByPriority).length > 0 ? Object.entries(openByPriority).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
-            report += '### By Category\n';
-            report += (Object.keys(openByCategory).length > 0 ? Object.entries(openByCategory).map(([label, count]) => '- ' + label + ': ' + count).join('\n') : '- None') + '\n\n';
-            report += '---\n\n## ⚠️ Attention Needed\n\n';
+            report += Object.keys(openByPriority).length > 0
+              ? Object.entries(openByPriority).map(([label, count]) => `- ${label}: ${count}`).join('\n')
+              : '- None';
+            report += '\n\n### By Category\n';
+            report += Object.keys(openByCategory).length > 0
+              ? Object.entries(openByCategory).map(([label, count]) => `- ${label}: ${count}`).join('\n')
+              : '- None';
+            report += '\n\n---\n\n## ⚠️ Attention Needed\n\n';
             if (overdueTickets.length > 0) {
-              report += '### Overdue Tickets (' + overdueTickets.length + ')\n';
-              report += overdueTickets.map(i => '- #' + i.number + ': ' + i.title).join('\n') + '\n\n';
+              report += `### Overdue Tickets (${overdueTickets.length})\n`;
+              report += overdueTickets.map((issue) => `- #${issue.number}: ${issue.title}`).join('\n');
+              report += '\n\n';
             } else {
               report += '✅ No overdue tickets!\n\n';
             }
             if (oldestTicketNumber) {
-              report += '### Oldest Open Ticket\n- #' + oldestTicketNumber + ' (' + Math.floor(oldestTicketAge) + ' days old)\n\n';
+              report += `### Oldest Open Ticket\n- #${oldestTicketNumber} (${Math.floor(oldestTicketAge)} days old)\n\n`;
             }
+
             report += '---\n\n## 📋 Tickets Opened This Week\n\n';
             if (createdThisWeek.length > 0) {
-              report += createdThisWeek.map(i => {
-                const priority = i.labels.find(l => l.name.startsWith('priority:'))?.name || 'no priority';
-                const category = i.labels.find(l => l.name.startsWith('category:'))?.name || 'uncategorized';
-                return '- #' + i.number + ': ' + i.title + ' [' + priority + ', ' + category + ']';
-              }).join('\n') + '\n\n';
+              report += createdThisWeek.map((issue) => {
+                const priority = issue.labels.find((l) => l.name.startsWith('priority:'))?.name || 'no priority';
+                const category = issue.labels.find((l) => l.name.startsWith('category:'))?.name || 'uncategorized';
+                return `- #${issue.number}: ${issue.title} [${priority}, ${category}]`;
+              }).join('\n');
+              report += '\n\n';
             } else {
               report += '*No new tickets this week*\n\n';
             }
+
             report += '---\n\n## ✅ Tickets Closed This Week\n\n';
-            report += (closedThisWeek.length > 0 ? closedThisWeek.map(i => '- #' + i.number + ': ' + i.title).join('\n') : '*No tickets closed this week*') + '\n\n';
+            if (closedThisWeek.length > 0) {
+              report += closedThisWeek.map((issue) => `- #${issue.number}: ${issue.title}`).join('\n');
+              report += '\n\n';
+            } else {
+              report += '*No tickets closed this week*\n\n';
+            }
+
             report += '---\n\n## 💡 Insights\n\n';
             if (createdThisWeek.length === 0 && closedThisWeek.length === 0) report += '- Quiet week! No new tickets.\n';
-            if (overdueTickets.length > 3) report += '- ⚠️ High number of overdue tickets (' + overdueTickets.length + '). Consider reviewing workload or priorities.\n';
+            if (overdueTickets.length > 3) report += `- ⚠️ High number of overdue tickets (${overdueTickets.length}). Consider reviewing workload or priorities.\n`;
             if (createdThisWeek.length > closedThisWeek.length + 5) report += '- ⚠️ Tickets are accumulating. New tickets outpacing closures.\n';
             if (currentlyOpen.length === 0) report += '- 🎉 All tickets resolved! Great work!\n';
             if (avgResponseHours !== 'N/A' && parseFloat(avgResponseHours) < 12) report += '- ✨ Excellent response time this week!\n';
+
             report += '\n---\n\n*This report is generated automatically every Monday. View [all open tickets](../../../issues) or [create a new ticket](../../../issues/new/choose).*';
 
             await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               title: `Weekly Report: ${weekStart} to ${weekEnd}`,
               body: report,
               labels: ['report']

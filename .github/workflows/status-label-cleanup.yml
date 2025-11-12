@@ -1,0 +1,60 @@
+name: Status Label Cleanup
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  cleanup-status-labels:
+    runs-on: ubuntu-latest
+    name: Remove old status labels when new one is added
+
+    steps:
+      - name: Clean up status labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Only run if a status label was just added
+            const newLabel = context.payload.label.name;
+
+            if (!newLabel.startsWith('status:')) {
+              console.log(`Label "${newLabel}" is not a status label - skipping cleanup`);
+              return;
+            }
+
+            console.log(`Status label "${newLabel}" was added - checking for old status labels to remove`);
+
+            // Get current labels on the issue
+            const issue = context.payload.issue;
+            const currentLabels = issue.labels.map(l => l.name);
+
+            // Find all status labels except the newly added one
+            const statusLabelsToRemove = currentLabels.filter(label =>
+              label.startsWith('status:') && label !== newLabel
+            );
+
+            if (statusLabelsToRemove.length === 0) {
+              console.log('No old status labels to remove');
+              return;
+            }
+
+            // Remove old status labels silently (no comments to avoid notifications)
+            for (const oldLabel of statusLabelsToRemove) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: oldLabel
+                });
+                console.log(`✓ Removed old status label: "${oldLabel}"`);
+              } catch (error) {
+                console.log(`Failed to remove label "${oldLabel}": ${error.message}`);
+              }
+            }
+
+            console.log(`Cleanup complete! Kept "${newLabel}", removed ${statusLabelsToRemove.length} old status label(s)`);
