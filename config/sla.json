@@ -1,0 +1,32 @@
+{
+  "priorities": {
+    "priority: urgent": {
+      "response_hours": 4,
+      "resolution_hours": 8
+    },
+    "priority: high": {
+      "response_hours": 4,
+      "resolution_hours": 72
+    },
+    "priority: medium": {
+      "response_hours": 24,
+      "resolution_hours": 120
+    },
+    "priority: low": {
+      "response_hours": 48,
+      "resolution_hours": 168
+    }
+  },
+  "default_priority": "priority: medium",
+  "procurement": {
+    "label": "category: procurement",
+    "response_hours": 48,
+    "resolution_hours": 1008,
+    "at_risk_lead_hours": 168
+  },
+  "long_term": {
+    "label": "category: long-term",
+    "title_prefix": "[Long-term]"
+  },
+  "at_risk_lead_hours": 24
+}
